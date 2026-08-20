@@ -2,11 +2,10 @@
 Генератор автономного HTML-дашборда (report_html.py) в стиле Mindbox.
 Поддерживает светлую и темную темы (Dark Mode) с переключателем и сохранением в localStorage.
 - 100% самодостаточный HTML (инлайн CSS, SVG-графики, 0 внешних CDN-ссылок)
-- Палитра Dark: #0B0F19 (фон), #151C2C (карточки), #232D42 (бордеры), #F1F5F9 (текст), #6366F1 (акцент)
-- Палитра Light: #F7F8FA (фон), #FFFFFF (карточки), #E8EAEF (бордеры), #16182B (текст), #4A3AFF (акцент)
-- Адаптивная тепловая карта через CSS color-mix (автоматически идеальна в обеих темах)
-- Автономные SVG-графики со стилизацией через CSS-переменные
-- Каскад маржинальности юнит-экономики и RFM-сегментация
+- Читаемый график удержания без M0 (шкала 0 - 25%/30%)
+- Чистая выручка по когортам с авто-масштабированием в рублях (k / M)
+- Топ-5 выраженных аномалий удержания без раздувания дашборда
+- Лаконичный бейдж движка ("Движок: Pandas" / "Движок: SQLite")
 """
 
 import pandas as pd
@@ -17,38 +16,55 @@ from src.report import detect_data_completeness, detect_retention_anomalies
 
 
 def generate_retention_curve_svg(avg_ret_series: pd.Series, cols: List[int]) -> str:
-    """Генерирует чистый SVG-график кривой среднего удержания, адаптирующийся под тему."""
+    """
+    Генерирует SVG-график кривой среднего удержания.
+    Начинается с M1 (без сжимающего шкалу M0=100%). Шкала Y динамически масштабируется.
+    """
     w, h = 480, 220
     pad_l, pad_r, pad_t, pad_b = 45, 20, 25, 35
     plot_w = w - pad_l - pad_r
     plot_h = h - pad_t - pad_b
 
+    # Исключаем M0, берем M1..M8
+    p_cols = [p for p in cols if p >= 1]
+    if not p_cols:
+        p_cols = list(range(1, 9))
+
+    vals = [avg_ret_series.get(p, 0.0) for p in p_cols]
+    max_ret = max(vals) if vals else 15.0
+    # Динамический максимум шкалы Y (округление вверх до кратного 5)
+    max_val = max(15.0, math.ceil((max_ret * 1.35) / 5.0) * 5.0)
+
     points = []
-    max_val = 100.0
-    for i, p in enumerate(cols):
+    for i, p in enumerate(p_cols):
         val = avg_ret_series.get(p, 0.0)
-        x = pad_l + (i / max(1, len(cols) - 1)) * plot_w
+        x = pad_l + (i / max(1, len(p_cols) - 1)) * plot_w
         y = pad_t + plot_h - (val / max_val) * plot_h
         points.append((x, y, val, p))
 
+    # Сетка и оси Y (4 шага)
     grid_lines = []
-    for y_val in [0, 25, 50, 75, 100]:
+    step = max_val / 4.0
+    for s_idx in range(5):
+        y_val = step * s_idx
         y_pos = pad_t + plot_h - (y_val / max_val) * plot_h
         grid_lines.append(
             f'<line x1="{pad_l}" y1="{y_pos}" x2="{w - pad_r}" y2="{y_pos}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />'
-            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="var(--text-dim)" text-anchor="end">{y_val}%</text>'
+            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="var(--text-dim)" text-anchor="end">{y_val:.0f}%</text>'
         )
 
+    # Подписи оси X (M1, M2, ...)
     for x, y, val, p in points:
         grid_lines.append(f'<text x="{x}" y="{h - 12}" font-size="11" fill="var(--text-dim)" text-anchor="middle">M{p}</text>')
 
+    # Линия и область заливки
     pts_str = " ".join([f"{x},{y}" for x, y, _, _ in points])
     area_pts = f"{pad_l},{pad_t + plot_h} " + pts_str + f" {points[-1][0]},{pad_t + plot_h}"
 
     dots = []
     for x, y, val, p in points:
         dots.append(
-            f'<circle cx="{x}" cy="{y}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" />'
+            f'<circle cx="{x}" cy="{y}" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" />'
             f'<title>M{p}: {val:.1f}%</title>'
         )
 
@@ -63,7 +79,7 @@ def generate_retention_curve_svg(avg_ret_series: pd.Series, cols: List[int]) -> 
 
 
 def generate_revenue_bars_svg(cohort_rev_df: pd.DataFrame) -> str:
-    """Генерирует чистый SVG-график выручки по когортам."""
+    """Генерирует чистый SVG-график выручки по когортам с авто-масштабированием шкалы."""
     w, h = 480, 220
     pad_l, pad_r, pad_t, pad_b = 60, 20, 25, 45
     plot_w = w - pad_l - pad_r
@@ -75,25 +91,37 @@ def generate_revenue_bars_svg(cohort_rev_df: pd.DataFrame) -> str:
         return "<svg></svg>"
     
     max_rev = max(rev_by_cohort.max(), 1.0)
-    bar_width = min(28, max(8, plot_w / (len(cohorts) * 1.6)))
-    gap = plot_w / len(cohorts)
+    # Масштаб и подписи оси Y
+    if max_rev >= 1_000_000:
+        divisor = 1_000_000.0
+        unit = "M ₽"
+    elif max_rev >= 1_000:
+        divisor = 1_000.0
+        unit = "k ₽"
+    else:
+        divisor = 1.0
+        unit = "₽"
 
     grid_lines = []
     for step in range(4):
-        val = (max_rev / 3) * step
+        val = (max_rev / 3.0) * step
         y_pos = pad_t + plot_h - (val / max_rev) * plot_h
+        val_str = f"{val/divisor:.1f}{unit}" if divisor > 1 and (val/divisor % 1 != 0) else f"{int(val/divisor)}{unit}"
         grid_lines.append(
             f'<line x1="{pad_l}" y1="{y_pos}" x2="{w - pad_r}" y2="{y_pos}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />'
-            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="var(--text-dim)" text-anchor="end">{int(val/1000)}k</text>'
+            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="var(--text-dim)" text-anchor="end">{val_str}</text>'
         )
 
     bars = []
+    bar_width = min(26, max(8, plot_w / (len(cohorts) * 1.5)))
+    gap = plot_w / len(cohorts)
+
     for i, c in enumerate(cohorts):
         r_val = rev_by_cohort[c]
         b_h = (r_val / max_rev) * plot_h
         x = pad_l + i * gap + (gap - bar_width) / 2
         y = pad_t + plot_h - b_h
-        label = str(c)[2:]
+        label = str(c)[2:] if len(str(c)) >= 5 else str(c)  # 21-02
         bars.append(
             f'<rect x="{x}" y="{y}" width="{bar_width}" height="{b_h}" rx="3" fill="var(--accent)" fill-opacity="0.85">'
             f'<title>{c}: {r_val:,.0f} руб.</title></rect>'
@@ -158,7 +186,7 @@ def generate_rfm_donut_svg(rfm_summary: pd.DataFrame) -> str:
     return f"""
     <svg viewBox="0 0 {size} {size}" width="{size}" height="{size}">
         {''.join(paths)}
-        <text x="{cx}" y="{cy - 4}" font-size="16" font-weight="600" fill="var(--text)" text-anchor="middle">{total_clients}</text>
+        <text x="{cx}" y="{cy - 4}" font-size="16" font-weight="600" fill="var(--text)" text-anchor="middle">{total_clients:,}</text>
         <text x="{cx}" y="{cy + 14}" font-size="11" fill="var(--text-dim)" text-anchor="middle">клиентов</text>
     </svg>
     """
@@ -171,12 +199,13 @@ def generate_html_report(
     cohort_matrix: pd.DataFrame,
     rfm_summary: pd.DataFrame,
     clean_df: Optional[pd.DataFrame] = None,
+    cohort_revenue: Optional[pd.DataFrame] = None,
     output_path: str = "output/report.html",
     source_filename: str = "sample_orders.csv",
-    engine_name: str = "Pandas Core Engine"
+    engine_name: str = "Pandas"
 ) -> str:
     """
-    Формирует красивый автономный HTML-отчет в дизайн-системе Mindbox с поддержкой Dark Mode.
+    Формирует красивый автономный HTML-отчет в дизайн-системе Mindbox.
     """
     now_str = datetime.now().strftime("%d.%m.%Y в %H:%M")
     total_orders = len(clean_df) if clean_df is not None else 0
@@ -202,9 +231,10 @@ def generate_html_report(
     else:
         availability = behavior_metrics.get("availability", {str(c): 8 for c in cohort_matrix.index})
 
-    cols = [c for c in range(9) if c in cohort_matrix.columns or any(availability.get(str(k), 0) >= c for k in cohort_matrix.index)]
+    # Начинаем с M1 (M0 не дублируется)
+    cols = [c for c in range(1, 9) if c in cohort_matrix.columns or any(availability.get(str(k), 0) >= c for k in cohort_matrix.index)]
     if not cols:
-        cols = list(range(9))
+        cols = list(range(1, 9))
 
     # 3. Карточки KPI
     kpi_cards_html = []
@@ -235,7 +265,7 @@ def generate_html_report(
         </div>
         """)
 
-    # 4. Тепловая карта удержания (Heatmap M0-M8) с адаптивным color-mix
+    # 4. Тепловая карта удержания (Heatmap M1-M8)
     heatmap_rows = []
     for c in cohort_matrix.index:
         max_p = availability.get(str(c), 8)
@@ -248,8 +278,8 @@ def generate_html_report(
             else:
                 val = cohort_matrix.loc[c, p] if p in cohort_matrix.columns else 0
                 pct = (val / base_size * 100.0) if base_size > 0 else 0.0
-                mix_pct = min(100.0, pct * 1.1)
-                text_cls = "text-white" if pct > 38.0 else ""
+                mix_pct = min(100.0, pct * 1.8)
+                text_cls = "text-white" if pct > 35.0 else ""
                 cells_html.append(f"""
                 <td class="heat-cell {text_cls}" style="background-color: color-mix(in srgb, var(--accent) {mix_pct:.1f}%, var(--heat-base));">
                     <div class="pct-val">{pct:.1f}%</div>
@@ -258,7 +288,7 @@ def generate_html_report(
                 """)
         heatmap_rows.append(f"<tr>{''.join(cells_html)}</tr>")
 
-    # Строки средних
+    # Строки средних (M1..M8)
     avg_cells = ['<td class="cohort-name" style="font-weight:600;">Среднее удержание</td>', '<td class="cohort-base">—</td>']
     cnt_cells = ['<td class="cohort-name" style="font-weight:600;">Когорт в расчёте</td>', '<td class="cohort-base">—</td>']
     
@@ -280,17 +310,24 @@ def generate_html_report(
 
     # SVG Графики
     ret_curve_svg = generate_retention_curve_svg(avg_ret_series, cols)
-    cohort_rev_df = cohort_matrix.copy()
-    rev_bars_svg = generate_revenue_bars_svg(cohort_rev_df)
+    rev_df_to_use = cohort_revenue if cohort_revenue is not None else cohort_matrix
+    rev_bars_svg = generate_revenue_bars_svg(rev_df_to_use)
     rfm_donut_svg = generate_rfm_donut_svg(rfm_summary)
 
-    # Блок аномалий
-    anomalies = detect_retention_anomalies(cohort_matrix, availability, max_periods=len(cols))
-    if anomalies:
-        anomalies_items = "".join([f"<li>{a}</li>" for a in anomalies])
-        anomalies_html = f'<ul class="anomalies-list">{anomalies_items}</ul>'
+    # 5. Блок аномалий (топ-5 + скрытые)
+    anomaly_data = detect_retention_anomalies(cohort_matrix, availability, max_periods=9)
+    if anomaly_data["total_count"] > 0:
+        anom_items = []
+        for an in anomaly_data["top_anomalies"]:
+            anom_items.append(
+                f"<li>Отрицательный отвал в когорте <strong>{an['cohort']}</strong> на <strong>M{an['period']}</strong>: "
+                f"вернулось <strong>{an['curr_val']}</strong> клиентов (рост в <strong>{an['ratio']:.1f}x</strong>, на {an['diff']} больше, чем в M{an['period']-1}).</li>"
+            )
+        if anomaly_data["hidden_count"] > 0:
+            anom_items.append(f"<li style='color: var(--text-dim); list-style-type: none;'>...и ещё {anomaly_data['hidden_count']} менее выраженных всплесков активности.</li>")
+        anomalies_html = f'<ul class="anomalies-list">{"".join(anom_items)}</ul>'
     else:
-        anomalies_html = '<div class="text-dim">Значимых скачков удержания (отрицательного отвала) не обнаружено.</div>'
+        anomalies_html = '<div class="text-dim">Значимых выбросов удержания (роста > 1.5x) не обнаружено.</div>'
 
     # Таблица RFM
     rfm_rows_html = []
@@ -309,7 +346,7 @@ def generate_html_report(
         </tr>
         """)
 
-    # Каскад юнит-экономики (Водопад)
+    # Каскад юнит-экономики
     if is_full:
         cogs_val = costs_breakdown.get('cogs_per_client', 0.0)
         opex_val = costs_breakdown.get('delivery_per_client', 0.0) + costs_breakdown.get('payment_fee_per_client', 0.0)
@@ -372,7 +409,6 @@ def generate_html_report(
         </div>
         """
 
-    # Предупреждающая плашка в режиме partial
     if not is_full:
         warning_banner_html = """
         <div class="warning-banner">
@@ -385,6 +421,9 @@ def generate_html_report(
         """
     else:
         warning_banner_html = ""
+
+    # Очистка имени движка для лаконичности
+    clean_engine_label = engine_name.replace("Engine", "").replace("Core", "").replace("Fast", "").strip()
 
     html_content = f"""<!DOCTYPE html>
 <html lang="ru" data-theme="dark">
@@ -598,8 +637,8 @@ def generate_html_report(
         }}
         .w-dot {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }}
         .rfm-dot {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }}
-        .anomalies-list {{ margin: 8px 0 0 18px; font-size: 13px; color: var(--text); }}
-        .anomalies-list li {{ margin-bottom: 4px; }}
+        .anomalies-list {{ margin: 8px 0 0 18px; font-size: 13px; color: var(--text); line-height: 1.6; }}
+        .anomalies-list li {{ margin-bottom: 6px; }}
         .enrichment-card {{ background: var(--enrichment-bg); border: 1px dashed var(--border); border-radius: 8px; padding: 14px; margin-top: 14px; }}
         @media (max-width: 900px) {{
             .grid-4 {{ grid-template-columns: 1fr 1fr; }}
@@ -620,7 +659,7 @@ def generate_html_report(
             </div>
             <div class="header-controls">
                 <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Тёмная</button>
-                <div class="engine-badge">⚡ {engine_name}</div>
+                <div class="engine-badge">⚡ Движок: {clean_engine_label}</div>
             </div>
         </div>
 
@@ -634,7 +673,7 @@ def generate_html_report(
         <!-- Heatmap & Retention Curve -->
         <div class="card">
             <div class="card-title">
-                <span>Матрица удержания клиентов (M0 – M8)</span>
+                <span>Матрица удержания клиентов (M1 – M8)</span>
                 <span style="font-size: 12px; color: var(--text-dim); font-weight: normal;">% доля / абс. чел.</span>
             </div>
             <div style="overflow-x: auto;">
@@ -642,7 +681,7 @@ def generate_html_report(
                     <thead>
                         <tr>
                             <th style="text-align:left;">Когорта</th>
-                            <th>M0 База</th>
+                            <th>База (M0)</th>
                             {''.join([f'<th>M{p}</th>' for p in cols])}
                         </tr>
                     </thead>
@@ -662,14 +701,14 @@ def generate_html_report(
         <!-- 2 Charts Grid -->
         <div class="grid-2">
             <div class="card">
-                <div class="card-title">Динамика удержания (Retention Curve)</div>
+                <div class="card-title">Динамика удержания (Retention Curve M1–M8)</div>
                 {ret_curve_svg}
-                <div class="card-expl">Средневзвешенный процент повторных покупок. Наибольший отвал происходит на интервале M0 → M1.</div>
+                <div class="card-expl">Средневзвешенный процент повторных покупок без сжимающего шкалу M0 (100%). Показывает динамику между M1 и M8.</div>
             </div>
             <div class="card">
                 <div class="card-title">Выручка по когортам</div>
                 {rev_bars_svg}
-                <div class="card-expl">Суммарная выручка, сгенерированная каждой когортой за все доступные периоды жизни.</div>
+                <div class="card-expl">Суммарная выручка, сгенерированная каждой когортой за все доступные периоды жизни (руб.).</div>
             </div>
         </div>
 
@@ -713,7 +752,7 @@ def generate_html_report(
             </div>
 
             <div class="card">
-                <div class="card-title">Самопроверка и детекция аномалий</div>
+                <div class="card-title">Самопроверка и аномалии</div>
                 <div style="margin-bottom: 16px;">
                     <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Самопроверка расчета Базового LTV:</div>
                     <div style="font-size:13px; color:var(--text); line-height:1.6;">
@@ -723,11 +762,11 @@ def generate_html_report(
                     </div>
                 </div>
                 <div>
-                    <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Всплески удержания (отрицательный отвал):</div>
+                    <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Выраженные всплески активности (рост > 1.5x):</div>
                     {anomalies_html}
                 </div>
                 <div class="card-expl">
-                    Отрицательный отвал указывает на сезонные всплески повторных покупок или реактивацию спящих клиентов CRM-рассылками.
+                    Отрицательный отвал указывает на сезонность спроса или реактивацию спящих клиентов CRM-рассылками.
                 </div>
             </div>
         </div>

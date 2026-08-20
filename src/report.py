@@ -1,13 +1,12 @@
 """
-Генератор управленческого отчета в формате Markdown (report.py v2).
+Генератор управленческого отчета в формате Markdown (report.py v2.1).
 - Определение полноты данных (full vs partial mode)
 - Раздел 0: Аудит полноты исходных данных
 - Корректная обработка отсутствующих метрик (без ложных статусов UNPROFITABLE)
-- Матрицы удержания (абсолютная и процентная) с разделением 0 и ненаступивших периодов (—)
+- Матрицы удержания (M1-M8) с разделением 0 и ненаступивших периодов (—)
 - Расчет среднего удержания только по доступным когортам
 - Самопроверка расчета Базового LTV (формула vs факт)
-- Автоматический детектор аномалий (отрицательный отвал)
-- Рекомендации по обогащению выгрузки в режиме partial
+- Фильтрация выбросов удержания (топ-5 статистических аномалий + агрегация)
 """
 
 import pandas as pd
@@ -18,7 +17,6 @@ from typing import Dict, Any, List, Optional
 def detect_data_completeness(df: pd.DataFrame) -> Dict[str, Any]:
     """
     Проверяет наличие и наполненность ключевых финансовых колонок в датафрейме.
-    Поле считается отсутствующим, если его нет в колонках или сумма равна 0.
     """
     def check_col(name: str) -> bool:
         if name not in df.columns:
@@ -60,21 +58,40 @@ def detect_retention_anomalies(
     cohort_matrix: pd.DataFrame,
     availability: Dict[str, int],
     max_periods: int = 9
-) -> List[str]:
-    """Находит всплески удержания (отрицательный отвал: на периоде N вернулось больше, чем на N-1)."""
-    anomalies = []
+) -> Dict[str, Any]:
+    """
+    Находит только выраженные выбросы удержания (рост >= 1.5x к предыдущему периоду и прирост >= 3 чел.).
+    Возвращает топ-5 выраженных аномалий и счетчик менее заметных всплесков.
+    """
+    candidates = []
     for c in cohort_matrix.index:
         max_p = availability.get(str(c), max_periods - 1)
         for p in range(2, min(max_p + 1, max_periods)):
             curr_val = int(cohort_matrix.loc[c, p]) if p in cohort_matrix.columns else 0
             prev_val = int(cohort_matrix.loc[c, p - 1]) if (p - 1) in cohort_matrix.columns else 0
-            if curr_val > prev_val and prev_val > 0:
+            if prev_val >= 2 and curr_val >= int(prev_val * 1.45) and curr_val > 0:
                 diff = curr_val - prev_val
-                anomalies.append(
-                    f"Отрицательный отвал в когорте **{c}** на **M{p}**: вернулось **{curr_val}** клиентов "
-                    f"(на {diff} больше, чем в M{p-1})."
-                )
-    return anomalies
+                ratio = curr_val / prev_val
+                if diff >= 3:
+                    candidates.append({
+                        "cohort": str(c),
+                        "period": p,
+                        "curr_val": curr_val,
+                        "prev_val": prev_val,
+                        "diff": diff,
+                        "ratio": ratio,
+                        "score": diff * ratio
+                    })
+
+    candidates.sort(key=lambda x: x["score"], reverse=True)
+    top_5 = candidates[:5]
+    hidden_count = max(0, len(candidates) - 5)
+
+    return {
+        "top_anomalies": top_5,
+        "hidden_count": hidden_count,
+        "total_count": len(candidates)
+    }
 
 
 def generate_full_report(
@@ -87,7 +104,7 @@ def generate_full_report(
     output_path: str = "output/report.md"
 ) -> str:
     """
-    Собирает и сохраняет полный структурированный управленческий отчет v2.
+    Собирает и сохраняет полный структурированный управленческий отчет.
     """
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
     
@@ -112,15 +129,16 @@ def generate_full_report(
     else:
         availability = behavior_metrics.get("availability", {str(c): 8 for c in cohort_matrix.index})
 
-    # Ограничение периодов M0..M8
-    cols = [c for c in range(9) if c in cohort_matrix.columns or any(availability.get(str(k), 0) >= c for k in cohort_matrix.index)]
+    # Начинаем с M1, так как M0 дублирует размер когорты
+    cols = [c for c in range(1, 9) if c in cohort_matrix.columns or any(availability.get(str(k), 0) >= c for k in cohort_matrix.index)]
     if not cols:
-        cols = list(range(min(9, len(cohort_matrix.columns))))
+        cols = list(range(1, 9))
 
-    # 3. Форматирование абсолютной матрицы удержания (чел.) с прочерками для ненаступивших периодов
+    # 3. Форматирование абсолютной матрицы удержания (чел.)
     abs_matrix_rows = []
     for c in cohort_matrix.index:
-        row_dict = {"Когорта": str(c)}
+        base_size = int(cohort_matrix.loc[c, 0]) if 0 in cohort_matrix.columns else 0
+        row_dict = {"Когорта": str(c), "База (M0)": str(base_size)}
         max_p = availability.get(str(c), 8)
         for p in cols:
             if p > max_p:
@@ -135,9 +153,9 @@ def generate_full_report(
     # 4. Форматирование процентной матрицы удержания (%)
     pct_matrix_rows = []
     for c in cohort_matrix.index:
-        row_dict = {"Когорта": str(c)}
-        max_p = availability.get(str(c), 8)
         base_size = cohort_matrix.loc[c, 0] if 0 in cohort_matrix.columns else 1
+        row_dict = {"Когорта": str(c), "База (M0)": str(int(base_size))}
+        max_p = availability.get(str(c), 8)
         for p in cols:
             if p > max_p:
                 row_dict[f"M{p}"] = "—"
@@ -148,8 +166,8 @@ def generate_full_report(
         pct_matrix_rows.append(row_dict)
 
     # Среднее удержание только по доступным когортам
-    avg_ret_row = {"Когорта": "**Среднее удержание**"}
-    cohorts_cnt_row = {"Когорта": "**Когорт в расчёте**"}
+    avg_ret_row = {"Когорта": "**Среднее удержание**", "База (M0)": "—"}
+    cohorts_cnt_row = {"Когорта": "**Когорт в расчёте**", "База (M0)": "—"}
     for p in cols:
         eligible = [c for c in cohort_matrix.index if availability.get(str(c), 0) >= p]
         cohorts_cnt_row[f"M{p}"] = str(len(eligible))
@@ -168,12 +186,21 @@ def generate_full_report(
     pct_matrix_df = pd.DataFrame(pct_matrix_rows)
     pct_cohort_table_md = format_markdown_table(pct_matrix_df)
 
-    # 5. Детекция аномалий
-    anomalies = detect_retention_anomalies(cohort_matrix, availability, max_periods=len(cols))
-    if anomalies:
-        anomalies_md = "\n".join([f"- {a}" for a in anomalies])
+    # 5. Детекция аномалий (топ-5 + скрытые)
+    anomaly_data = detect_retention_anomalies(cohort_matrix, availability, max_periods=9)
+    if anomaly_data["total_count"] > 0:
+        anom_lines = []
+        for an in anomaly_data["top_anomalies"]:
+            anom_lines.append(
+                f"- Отрицательный отвал в когорте **{an['cohort']}** на **M{an['period']}**: "
+                f"вернулось **{an['curr_val']}** клиентов (рост в **{an['ratio']:.1f}x**, на {an['diff']} больше, чем в M{an['period']-1})."
+            )
+        if anomaly_data["hidden_count"] > 0:
+            anom_lines.append(f"- *...и ещё {anomaly_data['hidden_count']} менее выраженных всплесков активности в других когортах.*")
+        anom_lines.append("\n*Отрицательный отвал указывает на выраженную сезонность спроса или реактивацию спящих клиентов CRM-рассылками.*")
+        anomalies_md = "\n".join(anom_lines)
     else:
-        anomalies_md = "- Значимых аномалий удержания и скачков активности не обнаружено."
+        anomalies_md = "- Значимых аномалий удержания и резких скачков активности не обнаружено."
 
     # 6. RFM-таблица
     rfm_table_md = format_markdown_table(rfm_summary[[
@@ -188,7 +215,7 @@ def generate_full_report(
         "avg_monetary": "Ср. выручка (руб)"
     }))
 
-    # 7. Форматирование строк Юнит-экономики (с учетом None в partial mode)
+    # 7. Форматирование строк Юнит-экономики
     def fmt_curr(val: Optional[float], suffix: str = " руб.") -> str:
         if val is None:
             return "не рассчитан"
@@ -201,7 +228,6 @@ def generate_full_report(
 
     is_full = completeness["mode"] == "full"
 
-    # Шапка статуса
     if is_full and model_results.get("health_status"):
         header_status = f"`{model_results['health_status']}`"
     else:
@@ -260,7 +286,6 @@ def generate_full_report(
     ]
     ue_table_md = format_markdown_table(pd.DataFrame(ue_rows))
 
-    # Блок "Что нужно добавить в выгрузку" для partial mode
     if not is_full:
         enrichment_md = """
 ### 1.1. Что нужно добавить в выгрузку для полного расчёта
@@ -271,12 +296,10 @@ def generate_full_report(
     else:
         enrichment_md = ""
 
-    # Блок самопроверки LTV
     basic_ltv_fact = behavior_metrics.get("basic_ltv", 0.0)
     basic_ltv_formula = behavior_metrics.get("basic_ltv_formula_check", 0.0)
     ltv_diff_pct = behavior_metrics.get("ltv_discrepancy_pct", 0.0)
 
-    # 8. Сборка полного документа
     content = f"""# Отчет по юнит-экономике и когортному анализу
 
 **Дата расчета:** {now_str}  
@@ -311,11 +334,11 @@ def generate_full_report(
 - **Способ 2 (Формула $AOV \\times Frequency \\times Lifetime$):** {basic_ltv_formula:,.2f} руб.
 - **Расхождение:** {ltv_diff_pct}% *(отражает вариативность чеков и динамики повторов между когортами)*
 
-### Матрица удержания клиентов в абсолютных значениях (M0 - M8, чел.)
+### Матрица удержания клиентов в абсолютных значениях (M1 - M8, чел.)
 
 {abs_cohort_table_md}
 
-### Матрица удержания клиентов в долях от когорты (M0 - M8, %)
+### Матрица удержания клиентов в долях от когорты (M1 - M8, %)
 
 {pct_cohort_table_md}
 

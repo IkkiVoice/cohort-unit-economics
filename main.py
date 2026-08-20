@@ -52,7 +52,7 @@ def run_pipeline(
     print(f"[*] 2. Аудит полноты данных: режим '{completeness['mode']}' (COGS: {completeness['cogs']}, CAC: {completeness['acquisition_cost']})")
 
     # 4. Расчет когорт (Python или SQL)
-    engine_name = "SQLite SQL Engine" if use_sql else "Pandas Core Engine"
+    engine_name = "SQLite" if use_sql else "Pandas"
     if use_sql:
         print(f"[*] 3. Расчет когорт через движок {engine_name}...")
         cohort_clients, cohort_revenue, period_summary = build_cohort_matrices_sql(clean_df)
@@ -100,6 +100,7 @@ def run_pipeline(
             cohort_matrix=cohort_clients,
             rfm_summary=rfm_summary,
             clean_df=clean_df,
+            cohort_revenue=cohort_revenue,
             output_path=html_out,
             source_filename=os.path.basename(input_csv),
             engine_name=engine_name

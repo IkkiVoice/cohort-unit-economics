@@ -195,10 +195,6 @@ class TestCohortPipeline(unittest.TestCase):
     # --- ТЕСТЫ ЭПИКА E3: HTML-ДАШБОРД ---
 
     def test_html_report_standalone_and_no_cdn(self):
-        """
-        T3.1: Проверяет, что HTML-генератор возвращает валидный HTML
-        и НЕ содержит внешних ссылок на CDN (100% офлайн работа).
-        """
         df = clean_orders_data(self.sample_data)
         completeness = detect_data_completeness(df)
         clients_m, rev_m, summary = build_cohort_matrices(df)
@@ -216,6 +212,7 @@ class TestCohortPipeline(unittest.TestCase):
             cohort_matrix=clients_m,
             rfm_summary=rfm_summary,
             clean_df=df,
+            cohort_revenue=rev_m,
             output_path=out_html
         )
 
@@ -223,19 +220,14 @@ class TestCohortPipeline(unittest.TestCase):
         with open(out_html, "r", encoding="utf-8") as f:
             html_text = f.read()
 
-        # Валидность и автономность:
         self.assertIn("<!DOCTYPE html>", html_text)
         self.assertIn("<style>", html_text)
         self.assertIn("<svg", html_text)
         
-        # Запрет внешних ссылок на CDN / скрипты / шрифты:
         external_links = re.findall(r'(?:src|href)=["\'](https?://[^"\']+)["\']', html_text)
         self.assertEqual(len(external_links), 0, f"Обнаружены внешние ссылки в HTML: {external_links}")
 
     def test_html_and_markdown_parity(self):
-        """
-        T3.2: Проверяет соответствие ключевых чисел между Markdown и HTML.
-        """
         df = clean_orders_data(self.sample_data)
         completeness = detect_data_completeness(df)
         clients_m, rev_m, summary = build_cohort_matrices(df)
@@ -249,25 +241,19 @@ class TestCohortPipeline(unittest.TestCase):
         out_html = os.path.join(self.test_dir, "parity.html")
 
         generate_full_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, output_path=out_md)
-        generate_html_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, output_path=out_html)
+        generate_html_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, cohort_revenue=rev_m, output_path=out_html)
 
         with open(out_md, "r", encoding="utf-8") as f:
             md_text = f.read()
         with open(out_html, "r", encoding="utf-8") as f:
             html_text = f.read()
 
-        # Базовый LTV совпадает
         self.assertIn(f"{model['basic_ltv']:,.2f}", md_text)
         self.assertIn(f"{model['basic_ltv']:,.0f}", html_text)
-        # Размер базы совпадает
         self.assertIn(str(behavior["initial_cohort_size"]), md_text)
         self.assertIn(str(behavior["initial_cohort_size"]), html_text)
 
     def test_html_partial_mode_rendering(self):
-        """
-        T3.3: Проверяет отображение частичного режима в HTML на курсовом файле.
-        Плашка присутствует, нерассчитанные строки не содержат ложных 0.00 руб.
-        """
         course_file = os.path.join(os.path.dirname(__file__), "..", "data", "course", "sheet_02_15phCO86.csv")
         if not os.path.exists(course_file):
             self.skipTest("Файл курса sheet_02 не найден")
@@ -282,12 +268,11 @@ class TestCohortPipeline(unittest.TestCase):
         rfm_df, rfm_summary = calculate_rfm_segments(df)
 
         out_html = os.path.join(self.test_dir, "course_test.html")
-        generate_html_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, output_path=out_html)
+        generate_html_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, cohort_revenue=rev_m, output_path=out_html)
 
         with open(out_html, "r", encoding="utf-8") as f:
             html_text = f.read()
 
-        # Наличие плашки и отсутствие ложного статуса
         self.assertIn("warning-banner", html_text)
         self.assertIn("Режим частичных данных", html_text)
         self.assertNotIn("UNPROFITABLE", html_text)

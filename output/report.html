@@ -210,8 +210,8 @@
         }
         .w-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
         .rfm-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
-        .anomalies-list { margin: 8px 0 0 18px; font-size: 13px; color: var(--text); }
-        .anomalies-list li { margin-bottom: 4px; }
+        .anomalies-list { margin: 8px 0 0 18px; font-size: 13px; color: var(--text); line-height: 1.6; }
+        .anomalies-list li { margin-bottom: 6px; }
         .enrichment-card { background: var(--enrichment-bg); border: 1px dashed var(--border); border-radius: 8px; padding: 14px; margin-top: 14px; }
         @media (max-width: 900px) {
             .grid-4 { grid-template-columns: 1fr 1fr; }
@@ -228,11 +228,11 @@
         <div class="header-card">
             <div>
                 <div class="header-title">Аналитический дашборд юнит-экономики</div>
-                <div class="header-meta">Файл: <strong>sample_orders.csv</strong> • Обработано: <strong>3,309</strong> заказов • Дата: 21.08.2026 в 01:00</div>
+                <div class="header-meta">Файл: <strong>sample_orders.csv</strong> • Обработано: <strong>3,513</strong> заказов • Дата: 21.08.2026 в 01:12</div>
             </div>
             <div class="header-controls">
                 <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Тёмная</button>
-                <div class="engine-badge">⚡ Pandas Core Engine</div>
+                <div class="engine-badge">⚡ Движок: Pandas</div>
             </div>
         </div>
 
@@ -243,25 +243,25 @@
             
         <div class="kpi-card">
             <div class="kpi-title">Базовый LTV</div>
-            <div class="kpi-value" style="color: var(--text)">42,424 ₽</div>
+            <div class="kpi-value" style="color: var(--text)">44,958 ₽</div>
             <div class="kpi-sub">Выручка с привлеченного клиента за весь срок жизни</div>
         </div>
         
         <div class="kpi-card">
             <div class="kpi-title">Чистый LTV</div>
-            <div class="kpi-value" style="color: var(--text)">20,490 ₽</div>
-            <div class="kpi-sub">Чистая прибыль (маржинальность 48.3%)</div>
+            <div class="kpi-value" style="color: var(--text)">17,899 ₽</div>
+            <div class="kpi-sub">Чистая прибыль (маржинальность 39.8%)</div>
         </div>
         
         <div class="kpi-card">
             <div class="kpi-title">Стоимость привлечения (CAC)</div>
-            <div class="kpi-value" style="color: var(--text)">1,317 ₽</div>
+            <div class="kpi-value" style="color: var(--text)">5,176 ₽</div>
             <div class="kpi-sub">Маркетинговые затраты на привлечение 1 клиента</div>
         </div>
         
         <div class="kpi-card">
             <div class="kpi-title">Отношение LTV к CAC</div>
-            <div class="kpi-value" style="color: var(--positive)">16.56x</div>
+            <div class="kpi-value" style="color: var(--positive)">4.46x</div>
             <div class="kpi-sub">Возврат инвестиций (норматив ≥ 3.0x)</div>
         </div>
         
@@ -270,7 +270,7 @@
         <!-- Heatmap & Retention Curve -->
         <div class="card">
             <div class="card-title">
-                <span>Матрица удержания клиентов (M0 – M8)</span>
+                <span>Матрица удержания клиентов (M1 – M8)</span>
                 <span style="font-size: 12px; color: var(--text-dim); font-weight: normal;">% доля / абс. чел.</span>
             </div>
             <div style="overflow-x: auto;">
@@ -278,629 +278,539 @@
                     <thead>
                         <tr>
                             <th style="text-align:left;">Когорта</th>
-                            <th>M0 База</th>
-                            <th>M0</th><th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th><th>M7</th><th>M8</th>
+                            <th>База (M0)</th>
+                            <th>M1</th><th>M2</th><th>M3</th><th>M4</th><th>M5</th><th>M6</th><th>M7</th><th>M8</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td class="cohort-name">2025-01</td><td class="cohort-base">100</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">100</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.2%, var(--heat-base));">
-                    <div class="pct-val">12.0%</div>
-                    <div class="abs-val">12</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 23.1%, var(--heat-base));">
-                    <div class="pct-val">21.0%</div>
-                    <div class="abs-val">21</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.2%, var(--heat-base));">
-                    <div class="pct-val">22.0%</div>
-                    <div class="abs-val">22</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.2%, var(--heat-base));">
-                    <div class="pct-val">12.0%</div>
-                    <div class="abs-val">12</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.4%, var(--heat-base));">
-                    <div class="pct-val">14.0%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.7%, var(--heat-base));">
-                    <div class="pct-val">17.0%</div>
-                    <div class="abs-val">17</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.6%, var(--heat-base));">
-                    <div class="pct-val">6.0%</div>
-                    <div class="abs-val">6</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 9.9%, var(--heat-base));">
-                    <div class="pct-val">9.0%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-02</td><td class="cohort-base">116</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">116</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 14.2%, var(--heat-base));">
-                    <div class="pct-val">12.9%</div>
-                    <div class="abs-val">15</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.7%, var(--heat-base));">
-                    <div class="pct-val">22.4%</div>
-                    <div class="abs-val">26</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.6%, var(--heat-base));">
-                    <div class="pct-val">23.3%</div>
-                    <div class="abs-val">27</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.0%, var(--heat-base));">
-                    <div class="pct-val">16.4%</div>
-                    <div class="abs-val">19</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.8%, var(--heat-base));">
-                    <div class="pct-val">19.8%</div>
+                        <tr><td class="cohort-name">2025-01</td><td class="cohort-base">106</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 39.1%, var(--heat-base));">
+                    <div class="pct-val">21.7%</div>
                     <div class="abs-val">23</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.2%, var(--heat-base));">
-                    <div class="pct-val">13.8%</div>
-                    <div class="abs-val">16</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 7.6%, var(--heat-base));">
-                    <div class="pct-val">6.9%</div>
-                    <div class="abs-val">8</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.3%, var(--heat-base));">
-                    <div class="pct-val">12.1%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-03</td><td class="cohort-base">132</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">132</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.3%, var(--heat-base));">
-                    <div class="pct-val">16.7%</div>
-                    <div class="abs-val">22</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.7%, var(--heat-base));">
-                    <div class="pct-val">19.7%</div>
-                    <div class="abs-val">26</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.3%, var(--heat-base));">
-                    <div class="pct-val">16.7%</div>
-                    <div class="abs-val">22</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.5%, var(--heat-base));">
-                    <div class="pct-val">15.9%</div>
-                    <div class="abs-val">21</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 11.7%, var(--heat-base));">
-                    <div class="pct-val">10.6%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.0%, var(--heat-base));">
-                    <div class="pct-val">9.1%</div>
-                    <div class="abs-val">12</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 7.5%, var(--heat-base));">
-                    <div class="pct-val">6.8%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 7.5%, var(--heat-base));">
-                    <div class="pct-val">6.8%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-04</td><td class="cohort-base">95</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">95</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.7%, var(--heat-base));">
-                    <div class="pct-val">11.6%</div>
-                    <div class="abs-val">11</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 27.8%, var(--heat-base));">
-                    <div class="pct-val">25.3%</div>
-                    <div class="abs-val">24</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.3%, var(--heat-base));">
-                    <div class="pct-val">22.1%</div>
-                    <div class="abs-val">21</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.9%, var(--heat-base));">
-                    <div class="pct-val">12.6%</div>
-                    <div class="abs-val">12</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.4%, var(--heat-base));">
-                    <div class="pct-val">9.5%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.7%, var(--heat-base));">
-                    <div class="pct-val">11.6%</div>
-                    <div class="abs-val">11</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 11.6%, var(--heat-base));">
-                    <div class="pct-val">10.5%</div>
-                    <div class="abs-val">10</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 5.8%, var(--heat-base));">
-                    <div class="pct-val">5.3%</div>
-                    <div class="abs-val">5</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-05</td><td class="cohort-base">112</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">112</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.7%, var(--heat-base));">
-                    <div class="pct-val">16.1%</div>
-                    <div class="abs-val">18</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 27.5%, var(--heat-base));">
-                    <div class="pct-val">25.0%</div>
-                    <div class="abs-val">28</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.7%, var(--heat-base));">
-                    <div class="pct-val">16.1%</div>
-                    <div class="abs-val">18</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.7%, var(--heat-base));">
-                    <div class="pct-val">16.1%</div>
-                    <div class="abs-val">18</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.6%, var(--heat-base));">
-                    <div class="pct-val">19.6%</div>
-                    <div class="abs-val">22</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.8%, var(--heat-base));">
-                    <div class="pct-val">12.5%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.8%, var(--heat-base));">
-                    <div class="pct-val">9.8%</div>
-                    <div class="abs-val">11</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.9%, var(--heat-base));">
-                    <div class="pct-val">6.2%</div>
-                    <div class="abs-val">7</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-06</td><td class="cohort-base">83</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">83</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 11.9%, var(--heat-base));">
-                    <div class="pct-val">10.8%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 30.5%, var(--heat-base));">
-                    <div class="pct-val">27.7%</div>
-                    <div class="abs-val">23</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.6%, var(--heat-base));">
-                    <div class="pct-val">16.9%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.2%, var(--heat-base));">
-                    <div class="pct-val">15.7%</div>
-                    <div class="abs-val">13</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.6%, var(--heat-base));">
-                    <div class="pct-val">16.9%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.6%, var(--heat-base));">
-                    <div class="pct-val">6.0%</div>
-                    <div class="abs-val">5</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.6%, var(--heat-base));">
-                    <div class="pct-val">16.9%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 5.3%, var(--heat-base));">
-                    <div class="pct-val">4.8%</div>
-                    <div class="abs-val">4</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-07</td><td class="cohort-base">120</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">120</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.7%, var(--heat-base));">
-                    <div class="pct-val">23.3%</div>
-                    <div class="abs-val">28</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.7%, var(--heat-base));">
-                    <div class="pct-val">23.3%</div>
-                    <div class="abs-val">28</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 27.5%, var(--heat-base));">
-                    <div class="pct-val">25.0%</div>
-                    <div class="abs-val">30</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.6%, var(--heat-base));">
-                    <div class="pct-val">14.2%</div>
-                    <div class="abs-val">17</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.1%, var(--heat-base));">
-                    <div class="pct-val">19.2%</div>
-                    <div class="abs-val">23</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 14.7%, var(--heat-base));">
-                    <div class="pct-val">13.3%</div>
-                    <div class="abs-val">16</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 8.2%, var(--heat-base));">
-                    <div class="pct-val">7.5%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 11.9%, var(--heat-base));">
-                    <div class="pct-val">10.8%</div>
-                    <div class="abs-val">13</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-08</td><td class="cohort-base">102</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">102</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.1%, var(--heat-base));">
-                    <div class="pct-val">13.7%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 22.6%, var(--heat-base));">
-                    <div class="pct-val">20.6%</div>
-                    <div class="abs-val">21</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.6%, var(--heat-base));">
-                    <div class="pct-val">19.6%</div>
-                    <div class="abs-val">20</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.3%, var(--heat-base));">
-                    <div class="pct-val">16.7%</div>
-                    <div class="abs-val">17</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 9.7%, var(--heat-base));">
-                    <div class="pct-val">8.8%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.8%, var(--heat-base));">
-                    <div class="pct-val">9.8%</div>
-                    <div class="abs-val">10</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 8.6%, var(--heat-base));">
-                    <div class="pct-val">7.8%</div>
-                    <div class="abs-val">8</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.5%, var(--heat-base));">
-                    <div class="pct-val">5.9%</div>
-                    <div class="abs-val">6</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-09</td><td class="cohort-base">99</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">99</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.2%, var(--heat-base));">
-                    <div class="pct-val">11.1%</div>
-                    <div class="abs-val">11</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 26.7%, var(--heat-base));">
-                    <div class="pct-val">24.2%</div>
-                    <div class="abs-val">24</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.9%, var(--heat-base));">
-                    <div class="pct-val">17.2%</div>
-                    <div class="abs-val">17</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 22.2%, var(--heat-base));">
-                    <div class="pct-val">20.2%</div>
-                    <div class="abs-val">20</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.6%, var(--heat-base));">
-                    <div class="pct-val">14.1%</div>
-                    <div class="abs-val">14</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.3%, var(--heat-base));">
-                    <div class="pct-val">12.1%</div>
-                    <div class="abs-val">12</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.3%, var(--heat-base));">
-                    <div class="pct-val">12.1%</div>
-                    <div class="abs-val">12</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.7%, var(--heat-base));">
-                    <div class="pct-val">6.1%</div>
-                    <div class="abs-val">6</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-10</td><td class="cohort-base">126</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">126</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.5%, var(--heat-base));">
-                    <div class="pct-val">15.9%</div>
-                    <div class="abs-val">20</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 28.8%, var(--heat-base));">
-                    <div class="pct-val">26.2%</div>
-                    <div class="abs-val">33</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 26.2%, var(--heat-base));">
-                    <div class="pct-val">23.8%</div>
-                    <div class="abs-val">30</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 19.2%, var(--heat-base));">
-                    <div class="pct-val">17.5%</div>
-                    <div class="abs-val">22</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 20.1%, var(--heat-base));">
-                    <div class="pct-val">18.3%</div>
-                    <div class="abs-val">23</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.7%, var(--heat-base));">
-                    <div class="pct-val">14.3%</div>
-                    <div class="abs-val">18</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 11.3%, var(--heat-base));">
-                    <div class="pct-val">10.3%</div>
-                    <div class="abs-val">13</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.1%, var(--heat-base));">
-                    <div class="pct-val">11.9%</div>
-                    <div class="abs-val">15</div>
-                </td>
-                </tr><tr><td class="cohort-name">2025-11</td><td class="cohort-base">106</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">106</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.4%, var(--heat-base));">
-                    <div class="pct-val">9.4%</div>
-                    <div class="abs-val">10</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.9%, var(--heat-base));">
-                    <div class="pct-val">22.6%</div>
-                    <div class="abs-val">24</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 22.8%, var(--heat-base));">
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 37.4%, var(--heat-base));">
                     <div class="pct-val">20.8%</div>
                     <div class="abs-val">22</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 16.6%, var(--heat-base));">
-                    <div class="pct-val">15.1%</div>
-                    <div class="abs-val">16</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 49.2%, var(--heat-base));">
+                    <div class="pct-val">27.4%</div>
+                    <div class="abs-val">29</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 7.3%, var(--heat-base));">
-                    <div class="pct-val">6.6%</div>
-                    <div class="abs-val">7</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.5%, var(--heat-base));">
+                    <div class="pct-val">14.2%</div>
+                    <div class="abs-val">15</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.2%, var(--heat-base));">
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.7%, var(--heat-base));">
+                    <div class="pct-val">10.4%</div>
+                    <div class="abs-val">11</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.0%, var(--heat-base));">
+                    <div class="pct-val">9.4%</div>
+                    <div class="abs-val">10</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.2%, var(--heat-base));">
                     <div class="pct-val">5.7%</div>
                     <div class="abs-val">6</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 9.3%, var(--heat-base));">
-                    <div class="pct-val">8.5%</div>
-                    <div class="abs-val">9</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.6%, var(--heat-base));">
+                    <div class="pct-val">7.5%</div>
+                    <div class="abs-val">8</div>
                 </td>
-                <td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2025-12</td><td class="cohort-base">107</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">107</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.3%, var(--heat-base));">
-                    <div class="pct-val">9.3%</div>
-                    <div class="abs-val">10</div>
+                </tr><tr><td class="cohort-name">2025-02</td><td class="cohort-base">118</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 39.7%, var(--heat-base));">
+                    <div class="pct-val">22.0%</div>
+                    <div class="abs-val">26</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 20.6%, var(--heat-base));">
-                    <div class="pct-val">18.7%</div>
-                    <div class="abs-val">20</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 50.3%, var(--heat-base));">
+                    <div class="pct-val">28.0%</div>
+                    <div class="abs-val">33</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.7%, var(--heat-base));">
-                    <div class="pct-val">22.4%</div>
-                    <div class="abs-val">24</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 39.7%, var(--heat-base));">
+                    <div class="pct-val">22.0%</div>
+                    <div class="abs-val">26</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.5%, var(--heat-base));">
-                    <div class="pct-val">15.9%</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 29.0%, var(--heat-base));">
+                    <div class="pct-val">16.1%</div>
+                    <div class="abs-val">19</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.9%, var(--heat-base));">
+                    <div class="pct-val">14.4%</div>
                     <div class="abs-val">17</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.5%, var(--heat-base));">
-                    <div class="pct-val">15.9%</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.9%, var(--heat-base));">
+                    <div class="pct-val">14.4%</div>
                     <div class="abs-val">17</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 7.2%, var(--heat-base));">
-                    <div class="pct-val">6.5%</div>
-                    <div class="abs-val">7</div>
-                </td>
-                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-01</td><td class="cohort-base">108</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">108</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 9.2%, var(--heat-base));">
+                    <div class="pct-val">5.1%</div>
+                    <div class="abs-val">6</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 14.3%, var(--heat-base));">
-                    <div class="pct-val">13.0%</div>
-                    <div class="abs-val">14</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.3%, var(--heat-base));">
+                    <div class="pct-val">10.2%</div>
+                    <div class="abs-val">12</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-03</td><td class="cohort-base">130</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 34.6%, var(--heat-base));">
+                    <div class="pct-val">19.2%</div>
+                    <div class="abs-val">25</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 31.6%, var(--heat-base));">
-                    <div class="pct-val">28.7%</div>
-                    <div class="abs-val">31</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 54.0%, var(--heat-base));">
+                    <div class="pct-val">30.0%</div>
+                    <div class="abs-val">39</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 31.6%, var(--heat-base));">
-                    <div class="pct-val">28.7%</div>
-                    <div class="abs-val">31</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 30.5%, var(--heat-base));">
+                    <div class="pct-val">16.9%</div>
+                    <div class="abs-val">22</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.4%, var(--heat-base));">
-                    <div class="pct-val">19.4%</div>
-                    <div class="abs-val">21</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 30.5%, var(--heat-base));">
+                    <div class="pct-val">16.9%</div>
+                    <div class="abs-val">22</div>
                 </td>
                 
                 <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 19.4%, var(--heat-base));">
-                    <div class="pct-val">17.6%</div>
-                    <div class="abs-val">19</div>
-                </td>
-                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-02</td><td class="cohort-base">52</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
-                    <div class="abs-val">52</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 19.0%, var(--heat-base));">
-                    <div class="pct-val">17.3%</div>
-                    <div class="abs-val">9</div>
-                </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 29.6%, var(--heat-base));">
-                    <div class="pct-val">26.9%</div>
+                    <div class="pct-val">10.8%</div>
                     <div class="abs-val">14</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 19.0%, var(--heat-base));">
-                    <div class="pct-val">17.3%</div>
-                    <div class="abs-val">9</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.2%, var(--heat-base));">
+                    <div class="pct-val">8.5%</div>
+                    <div class="abs-val">11</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 21.2%, var(--heat-base));">
-                    <div class="pct-val">19.2%</div>
-                    <div class="abs-val">10</div>
-                </td>
-                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-03</td><td class="cohort-base">3</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 4.2%, var(--heat-base));">
+                    <div class="pct-val">2.3%</div>
                     <div class="abs-val">3</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 0.0%, var(--heat-base));">
-                    <div class="pct-val">0.0%</div>
-                    <div class="abs-val">0</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 9.7%, var(--heat-base));">
+                    <div class="pct-val">5.4%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-04</td><td class="cohort-base">87</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 35.2%, var(--heat-base));">
+                    <div class="pct-val">19.5%</div>
+                    <div class="abs-val">17</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 0.0%, var(--heat-base));">
-                    <div class="pct-val">0.0%</div>
-                    <div class="abs-val">0</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 51.7%, var(--heat-base));">
+                    <div class="pct-val">28.7%</div>
+                    <div class="abs-val">25</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 36.7%, var(--heat-base));">
-                    <div class="pct-val">33.3%</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 41.4%, var(--heat-base));">
+                    <div class="pct-val">23.0%</div>
+                    <div class="abs-val">20</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.8%, var(--heat-base));">
+                    <div class="pct-val">13.8%</div>
+                    <div class="abs-val">12</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 16.6%, var(--heat-base));">
+                    <div class="pct-val">9.2%</div>
+                    <div class="abs-val">8</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 14.5%, var(--heat-base));">
+                    <div class="pct-val">8.0%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.3%, var(--heat-base));">
+                    <div class="pct-val">5.7%</div>
+                    <div class="abs-val">5</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.2%, var(--heat-base));">
+                    <div class="pct-val">3.4%</div>
+                    <div class="abs-val">3</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-05</td><td class="cohort-base">109</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 29.7%, var(--heat-base));">
+                    <div class="pct-val">16.5%</div>
+                    <div class="abs-val">18</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 62.8%, var(--heat-base));">
+                    <div class="pct-val">34.9%</div>
+                    <div class="abs-val">38</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 41.3%, var(--heat-base));">
+                    <div class="pct-val">22.9%</div>
+                    <div class="abs-val">25</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 34.7%, var(--heat-base));">
+                    <div class="pct-val">19.3%</div>
+                    <div class="abs-val">21</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 26.4%, var(--heat-base));">
+                    <div class="pct-val">14.7%</div>
+                    <div class="abs-val">16</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.2%, var(--heat-base));">
+                    <div class="pct-val">10.1%</div>
+                    <div class="abs-val">11</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 11.6%, var(--heat-base));">
+                    <div class="pct-val">6.4%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 16.5%, var(--heat-base));">
+                    <div class="pct-val">9.2%</div>
+                    <div class="abs-val">10</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-06</td><td class="cohort-base">85</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 38.1%, var(--heat-base));">
+                    <div class="pct-val">21.2%</div>
+                    <div class="abs-val">18</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 46.6%, var(--heat-base));">
+                    <div class="pct-val">25.9%</div>
+                    <div class="abs-val">22</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 33.9%, var(--heat-base));">
+                    <div class="pct-val">18.8%</div>
+                    <div class="abs-val">16</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 36.0%, var(--heat-base));">
+                    <div class="pct-val">20.0%</div>
+                    <div class="abs-val">17</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 25.4%, var(--heat-base));">
+                    <div class="pct-val">14.1%</div>
+                    <div class="abs-val">12</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.7%, var(--heat-base));">
+                    <div class="pct-val">7.1%</div>
+                    <div class="abs-val">6</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.7%, var(--heat-base));">
+                    <div class="pct-val">7.1%</div>
+                    <div class="abs-val">6</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 6.4%, var(--heat-base));">
+                    <div class="pct-val">3.5%</div>
+                    <div class="abs-val">3</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-07</td><td class="cohort-base">118</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 48.8%, var(--heat-base));">
+                    <div class="pct-val">27.1%</div>
+                    <div class="abs-val">32</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 59.5%, var(--heat-base));">
+                    <div class="pct-val">33.1%</div>
+                    <div class="abs-val">39</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 47.3%, var(--heat-base));">
+                    <div class="pct-val">26.3%</div>
+                    <div class="abs-val">31</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 32.0%, var(--heat-base));">
+                    <div class="pct-val">17.8%</div>
+                    <div class="abs-val">21</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 33.6%, var(--heat-base));">
+                    <div class="pct-val">18.6%</div>
+                    <div class="abs-val">22</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 19.8%, var(--heat-base));">
+                    <div class="pct-val">11.0%</div>
+                    <div class="abs-val">13</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 18.3%, var(--heat-base));">
+                    <div class="pct-val">10.2%</div>
+                    <div class="abs-val">12</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.7%, var(--heat-base));">
+                    <div class="pct-val">7.6%</div>
+                    <div class="abs-val">9</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-08</td><td class="cohort-base">104</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 36.3%, var(--heat-base));">
+                    <div class="pct-val">20.2%</div>
+                    <div class="abs-val">21</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 51.9%, var(--heat-base));">
+                    <div class="pct-val">28.8%</div>
+                    <div class="abs-val">30</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 41.5%, var(--heat-base));">
+                    <div class="pct-val">23.1%</div>
+                    <div class="abs-val">24</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 26.0%, var(--heat-base));">
+                    <div class="pct-val">14.4%</div>
+                    <div class="abs-val">15</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.3%, var(--heat-base));">
+                    <div class="pct-val">9.6%</div>
+                    <div class="abs-val">10</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.6%, var(--heat-base));">
+                    <div class="pct-val">8.7%</div>
+                    <div class="abs-val">9</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.1%, var(--heat-base));">
+                    <div class="pct-val">6.7%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 13.8%, var(--heat-base));">
+                    <div class="pct-val">7.7%</div>
+                    <div class="abs-val">8</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-09</td><td class="cohort-base">102</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 44.1%, var(--heat-base));">
+                    <div class="pct-val">24.5%</div>
+                    <div class="abs-val">25</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 42.4%, var(--heat-base));">
+                    <div class="pct-val">23.5%</div>
+                    <div class="abs-val">24</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 38.8%, var(--heat-base));">
+                    <div class="pct-val">21.6%</div>
+                    <div class="abs-val">22</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 28.2%, var(--heat-base));">
+                    <div class="pct-val">15.7%</div>
+                    <div class="abs-val">16</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 22.9%, var(--heat-base));">
+                    <div class="pct-val">12.7%</div>
+                    <div class="abs-val">13</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.4%, var(--heat-base));">
+                    <div class="pct-val">6.9%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.4%, var(--heat-base));">
+                    <div class="pct-val">6.9%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 10.6%, var(--heat-base));">
+                    <div class="pct-val">5.9%</div>
+                    <div class="abs-val">6</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-10</td><td class="cohort-base">132</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 31.4%, var(--heat-base));">
+                    <div class="pct-val">17.4%</div>
+                    <div class="abs-val">23</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 61.4%, var(--heat-base));">
+                    <div class="pct-val">34.1%</div>
+                    <div class="abs-val">45</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 31.4%, var(--heat-base));">
+                    <div class="pct-val">17.4%</div>
+                    <div class="abs-val">23</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.5%, var(--heat-base));">
+                    <div class="pct-val">13.6%</div>
+                    <div class="abs-val">18</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 31.4%, var(--heat-base));">
+                    <div class="pct-val">17.4%</div>
+                    <div class="abs-val">23</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 5.5%, var(--heat-base));">
+                    <div class="pct-val">3.0%</div>
+                    <div class="abs-val">4</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 15.0%, var(--heat-base));">
+                    <div class="pct-val">8.3%</div>
+                    <div class="abs-val">11</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.3%, var(--heat-base));">
+                    <div class="pct-val">6.8%</div>
+                    <div class="abs-val">9</div>
+                </td>
+                </tr><tr><td class="cohort-name">2025-11</td><td class="cohort-base">104</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 38.1%, var(--heat-base));">
+                    <div class="pct-val">21.2%</div>
+                    <div class="abs-val">22</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 45.0%, var(--heat-base));">
+                    <div class="pct-val">25.0%</div>
+                    <div class="abs-val">26</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 38.1%, var(--heat-base));">
+                    <div class="pct-val">21.2%</div>
+                    <div class="abs-val">22</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 22.5%, var(--heat-base));">
+                    <div class="pct-val">12.5%</div>
+                    <div class="abs-val">13</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 24.2%, var(--heat-base));">
+                    <div class="pct-val">13.5%</div>
+                    <div class="abs-val">14</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.1%, var(--heat-base));">
+                    <div class="pct-val">6.7%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 12.1%, var(--heat-base));">
+                    <div class="pct-val">6.7%</div>
+                    <div class="abs-val">7</div>
+                </td>
+                <td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2025-12</td><td class="cohort-base">106</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 27.2%, var(--heat-base));">
+                    <div class="pct-val">15.1%</div>
+                    <div class="abs-val">16</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 40.8%, var(--heat-base));">
+                    <div class="pct-val">22.6%</div>
+                    <div class="abs-val">24</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 32.3%, var(--heat-base));">
+                    <div class="pct-val">17.9%</div>
+                    <div class="abs-val">19</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 23.8%, var(--heat-base));">
+                    <div class="pct-val">13.2%</div>
+                    <div class="abs-val">14</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 20.4%, var(--heat-base));">
+                    <div class="pct-val">11.3%</div>
+                    <div class="abs-val">12</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 17.0%, var(--heat-base));">
+                    <div class="pct-val">9.4%</div>
+                    <div class="abs-val">10</div>
+                </td>
+                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-01</td><td class="cohort-base">115</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 42.3%, var(--heat-base));">
+                    <div class="pct-val">23.5%</div>
+                    <div class="abs-val">27</div>
+                </td>
+                
+                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 67.3%, var(--heat-base));">
+                    <div class="pct-val">37.4%</div>
+                    <div class="abs-val">43</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 37.6%, var(--heat-base));">
+                    <div class="pct-val">20.9%</div>
+                    <div class="abs-val">24</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 43.8%, var(--heat-base));">
+                    <div class="pct-val">24.3%</div>
+                    <div class="abs-val">28</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 32.9%, var(--heat-base));">
+                    <div class="pct-val">18.3%</div>
+                    <div class="abs-val">21</div>
+                </td>
+                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-02</td><td class="cohort-base">49</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 55.1%, var(--heat-base));">
+                    <div class="pct-val">30.6%</div>
+                    <div class="abs-val">15</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 33.1%, var(--heat-base));">
+                    <div class="pct-val">18.4%</div>
+                    <div class="abs-val">9</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 33.1%, var(--heat-base));">
+                    <div class="pct-val">18.4%</div>
+                    <div class="abs-val">9</div>
+                </td>
+                
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 22.0%, var(--heat-base));">
+                    <div class="pct-val">12.2%</div>
+                    <div class="abs-val">6</div>
+                </td>
+                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-03</td><td class="cohort-base">5</td>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 36.0%, var(--heat-base));">
+                    <div class="pct-val">20.0%</div>
                     <div class="abs-val">1</div>
                 </td>
-                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr><tr><td class="cohort-name">2026-04</td><td class="cohort-base">2</td>
-                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 100.0%, var(--heat-base));">
-                    <div class="pct-val">100.0%</div>
+                
+                <td class="heat-cell text-white" style="background-color: color-mix(in srgb, var(--accent) 72.0%, var(--heat-base));">
+                    <div class="pct-val">40.0%</div>
                     <div class="abs-val">2</div>
                 </td>
                 
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 0.0%, var(--heat-base));">
-                    <div class="pct-val">0.0%</div>
-                    <div class="abs-val">0</div>
+                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 36.0%, var(--heat-base));">
+                    <div class="pct-val">20.0%</div>
+                    <div class="abs-val">1</div>
                 </td>
-                
-                <td class="heat-cell " style="background-color: color-mix(in srgb, var(--accent) 0.0%, var(--heat-base));">
-                    <div class="pct-val">0.0%</div>
-                    <div class="abs-val">0</div>
-                </td>
-                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr>
-                        <tr><td class="cohort-name" style="font-weight:600;">Среднее удержание</td><td class="cohort-base">—</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">100.0%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">12.1%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">20.8%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">21.7%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">16.2%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">14.7%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">11.0%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">9.4%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">7.9%</td></tr>
-                        <tr><td class="cohort-name" style="font-weight:600;">Когорт в расчёте</td><td class="cohort-base">—</td><td class="summary-cell">16</td><td class="summary-cell">16</td><td class="summary-cell">16</td><td class="summary-cell">15</td><td class="summary-cell">14</td><td class="summary-cell">13</td><td class="summary-cell">12</td><td class="summary-cell">11</td><td class="summary-cell">10</td></tr>
+                <td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td><td class="heat-cell heat-empty">—</td></tr>
+                        <tr><td class="cohort-name" style="font-weight:600;">Среднее удержание</td><td class="cohort-base">—</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">21.3%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">28.7%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">21.2%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">16.0%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">13.5%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">8.6%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">6.5%</td><td class="summary-cell" style="font-weight:600; color: var(--accent);">6.7%</td></tr>
+                        <tr><td class="cohort-name" style="font-weight:600;">Когорт в расчёте</td><td class="cohort-base">—</td><td class="summary-cell">15</td><td class="summary-cell">15</td><td class="summary-cell">15</td><td class="summary-cell">14</td><td class="summary-cell">13</td><td class="summary-cell">12</td><td class="summary-cell">11</td><td class="summary-cell">10</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -913,26 +823,26 @@
         <!-- 2 Charts Grid -->
         <div class="grid-2">
             <div class="card">
-                <div class="card-title">Динамика удержания (Retention Curve)</div>
+                <div class="card-title">Динамика удержания (Retention Curve M1–M8)</div>
                 
     <svg viewBox="0 0 480 220" width="100%" height="220" class="chart-svg">
-        <line x1="45" y1="185.0" x2="460" y2="185.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="189.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0%</text><line x1="45" y1="145.0" x2="460" y2="145.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="149.0" font-size="11" fill="var(--text-dim)" text-anchor="end">25%</text><line x1="45" y1="105.0" x2="460" y2="105.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="109.0" font-size="11" fill="var(--text-dim)" text-anchor="end">50%</text><line x1="45" y1="65.0" x2="460" y2="65.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="69.0" font-size="11" fill="var(--text-dim)" text-anchor="end">75%</text><line x1="45" y1="25.0" x2="460" y2="25.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="29.0" font-size="11" fill="var(--text-dim)" text-anchor="end">100%</text><text x="45.0" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M0</text><text x="96.875" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M1</text><text x="148.75" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M2</text><text x="200.625" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M3</text><text x="252.5" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M4</text><text x="304.375" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M5</text><text x="356.25" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M6</text><text x="408.125" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M7</text><text x="460.0" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M8</text>
-        <polygon points="45,185 45.0,25.0 96.875,165.68151869758807 148.75,151.760088802521 200.625,150.32211975137204 252.5,159.07918467017817 304.375,161.50615961052796 356.25,167.4355105286277 408.125,169.98875294341087 460.0,172.37589814744456 460.0,185" fill="var(--accent)" fill-opacity="0.15" />
-        <polyline points="45.0,25.0 96.875,165.68151869758807 148.75,151.760088802521 200.625,150.32211975137204 252.5,159.07918467017817 304.375,161.50615961052796 356.25,167.4355105286277 408.125,169.98875294341087 460.0,172.37589814744456" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-        <circle cx="45.0" cy="25.0" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M0: 100.0%</title><circle cx="96.875" cy="165.68151869758807" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M1: 12.1%</title><circle cx="148.75" cy="151.760088802521" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M2: 20.8%</title><circle cx="200.625" cy="150.32211975137204" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M3: 21.7%</title><circle cx="252.5" cy="159.07918467017817" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M4: 16.2%</title><circle cx="304.375" cy="161.50615961052796" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M5: 14.7%</title><circle cx="356.25" cy="167.4355105286277" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M6: 11.0%</title><circle cx="408.125" cy="169.98875294341087" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M7: 9.4%</title><circle cx="460.0" cy="172.37589814744456" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M8: 7.9%</title>
+        <line x1="45" y1="185.0" x2="460" y2="185.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="189.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0%</text><line x1="45" y1="145.0" x2="460" y2="145.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="149.0" font-size="11" fill="var(--text-dim)" text-anchor="end">10%</text><line x1="45" y1="105.0" x2="460" y2="105.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="109.0" font-size="11" fill="var(--text-dim)" text-anchor="end">20%</text><line x1="45" y1="65.0" x2="460" y2="65.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="69.0" font-size="11" fill="var(--text-dim)" text-anchor="end">30%</text><line x1="45" y1="25.0" x2="460" y2="25.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="37" y="29.0" font-size="11" fill="var(--text-dim)" text-anchor="end">40%</text><text x="45.0" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M1</text><text x="104.28571428571428" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M2</text><text x="163.57142857142856" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M3</text><text x="222.85714285714286" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M4</text><text x="282.1428571428571" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M5</text><text x="341.42857142857144" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M6</text><text x="400.7142857142857" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M7</text><text x="460.0" y="208" font-size="11" fill="var(--text-dim)" text-anchor="middle">M8</text>
+        <polygon points="45,185 45.0,99.72615137746367 104.28571428571428,70.03502079941534 163.57142857142856,100.27478752684588 222.85714285714286,120.97786566188785 282.1428571428571,131.14853139069336 341.42857142857144,150.59086700782353 400.7142857142857,159.14258466834667 460.0,158.0907050518104 460.0,185" fill="var(--accent)" fill-opacity="0.15" />
+        <polyline points="45.0,99.72615137746367 104.28571428571428,70.03502079941534 163.57142857142856,100.27478752684588 222.85714285714286,120.97786566188785 282.1428571428571,131.14853139069336 341.42857142857144,150.59086700782353 400.7142857142857,159.14258466834667 460.0,158.0907050518104" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="45.0" cy="99.72615137746367" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M1: 21.3%</title><circle cx="104.28571428571428" cy="70.03502079941534" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M2: 28.7%</title><circle cx="163.57142857142856" cy="100.27478752684588" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M3: 21.2%</title><circle cx="222.85714285714286" cy="120.97786566188785" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M4: 16.0%</title><circle cx="282.1428571428571" cy="131.14853139069336" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M5: 13.5%</title><circle cx="341.42857142857144" cy="150.59086700782353" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M6: 8.6%</title><circle cx="400.7142857142857" cy="159.14258466834667" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M7: 6.5%</title><circle cx="460.0" cy="158.0907050518104" r="4.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" /><title>M8: 6.7%</title>
     </svg>
     
-                <div class="card-expl">Средневзвешенный процент повторных покупок. Наибольший отвал происходит на интервале M0 → M1.</div>
+                <div class="card-expl">Средневзвешенный процент повторных покупок без сжимающего шкалу M0 (100%). Показывает динамику между M1 и M8.</div>
             </div>
             <div class="card">
                 <div class="card-title">Выручка по когортам</div>
                 
     <svg viewBox="0 0 480 220" width="100%" height="220" class="chart-svg">
-        <line x1="60" y1="175.0" x2="460" y2="175.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="179.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0k</text><line x1="60" y1="125.0" x2="460" y2="125.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="129.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0k</text><line x1="60" y1="75.0" x2="460" y2="75.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="79.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0k</text><line x1="60" y1="25.0" x2="460" y2="25.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="29.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0k</text>
-        <rect x="64.6875" y="62.61904761904762" width="15.625" height="112.38095238095238" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-01: 236 руб.</title></rect><text x="72.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 72.5 202)">25-01</text><rect x="89.6875" y="25.0" width="15.625" height="150.0" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-02: 315 руб.</title></rect><text x="97.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 97.5 202)">25-02</text><rect x="114.6875" y="39.28571428571428" width="15.625" height="135.71428571428572" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-03: 285 руб.</title></rect><text x="122.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 122.5 202)">25-03</text><rect x="139.6875" y="74.52380952380953" width="15.625" height="100.47619047619047" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-04: 211 руб.</title></rect><text x="147.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 147.5 202)">25-04</text><rect x="164.6875" y="42.61904761904762" width="15.625" height="132.38095238095238" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-05: 278 руб.</title></rect><text x="172.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 172.5 202)">25-05</text><rect x="189.6875" y="80.23809523809524" width="15.625" height="94.76190476190476" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-06: 199 руб.</title></rect><text x="197.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 197.5 202)">25-06</text><rect x="214.6875" y="33.0952380952381" width="15.625" height="141.9047619047619" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-07: 298 руб.</title></rect><text x="222.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 222.5 202)">25-07</text><rect x="239.6875" y="70.71428571428572" width="15.625" height="104.28571428571428" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-08: 219 руб.</title></rect><text x="247.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 247.5 202)">25-08</text><rect x="264.6875" y="70.23809523809524" width="15.625" height="104.76190476190476" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-09: 220 руб.</title></rect><text x="272.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 272.5 202)">25-09</text><rect x="289.6875" y="32.14285714285714" width="15.625" height="142.85714285714286" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-10: 300 руб.</title></rect><text x="297.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 297.5 202)">25-10</text><rect x="314.6875" y="79.76190476190477" width="15.625" height="95.23809523809523" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-11: 200 руб.</title></rect><text x="322.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 322.5 202)">25-11</text><rect x="339.6875" y="78.8095238095238" width="15.625" height="96.1904761904762" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-12: 202 руб.</title></rect><text x="347.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 347.5 202)">25-12</text><rect x="364.6875" y="68.33333333333333" width="15.625" height="106.66666666666667" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-01: 224 руб.</title></rect><text x="372.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 372.5 202)">26-01</text><rect x="389.6875" y="130.23809523809524" width="15.625" height="44.76190476190476" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-02: 94 руб.</title></rect><text x="397.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 397.5 202)">26-02</text><rect x="414.6875" y="173.0952380952381" width="15.625" height="1.9047619047619047" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-03: 4 руб.</title></rect><text x="422.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 422.5 202)">26-03</text><rect x="439.6875" y="174.04761904761904" width="15.625" height="0.9523809523809523" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-04: 2 руб.</title></rect><text x="447.5" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 447.5 202)">26-04</text>
+        <line x1="60" y1="175.0" x2="460" y2="175.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="179.0" font-size="11" fill="var(--text-dim)" text-anchor="end">0M ₽</text><line x1="60" y1="125.0" x2="460" y2="125.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="129.0" font-size="11" fill="var(--text-dim)" text-anchor="end">2.1M ₽</text><line x1="60" y1="75.0" x2="460" y2="75.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="79.0" font-size="11" fill="var(--text-dim)" text-anchor="end">4.1M ₽</text><line x1="60" y1="25.0" x2="460" y2="25.0" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" /><text x="52" y="29.0" font-size="11" fill="var(--text-dim)" text-anchor="end">6.2M ₽</text>
+        <rect x="64.44444444444444" y="58.90295923942368" width="17.77777777777778" height="116.09704076057632" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-01: 4,800,954 руб.</title></rect><text x="73.33333333333333" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 73.33333333333333 202)">25-01</text><rect x="91.11111111111111" y="31.671944200460274" width="17.77777777777778" height="143.32805579953973" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-02: 5,927,037 руб.</title></rect><text x="100.0" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 100.0 202)">25-02</text><rect x="117.77777777777779" y="25.0" width="17.77777777777778" height="150.0" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-03: 6,202,941 руб.</title></rect><text x="126.66666666666667" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 126.66666666666667 202)">25-03</text><rect x="144.44444444444446" y="80.9585963465214" width="17.77777777777778" height="94.0414036534786" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-04: 3,888,889 руб.</title></rect><text x="153.33333333333334" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 153.33333333333334 202)">25-04</text><rect x="171.11111111111114" y="33.9698461753506" width="17.77777777777778" height="141.0301538246494" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-05: 5,832,012 руб.</title></rect><text x="180.00000000000003" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 180.00000000000003 202)">25-05</text><rect x="197.7777777777778" y="83.84312694040904" width="17.77777777777778" height="91.15687305959096" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-06: 3,769,605 руб.</title></rect><text x="206.66666666666669" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 206.66666666666669 202)">25-06</text><rect x="224.44444444444446" y="28.15405941383463" width="17.77777777777778" height="146.84594058616537" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-07: 6,072,512 руб.</title></rect><text x="233.33333333333334" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 233.33333333333334 202)">25-07</text><rect x="251.11111111111114" y="66.12896920135223" width="17.77777777777778" height="108.87103079864777" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-08: 4,502,138 руб.</title></rect><text x="260.00000000000006" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 260.00000000000006 202)">25-08</text><rect x="277.7777777777778" y="59.22343920900019" width="17.77777777777778" height="115.77656079099981" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-09: 4,787,702 руб.</title></rect><text x="286.66666666666674" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 286.66666666666674 202)">25-09</text><rect x="304.44444444444446" y="36.17303590751749" width="17.77777777777778" height="138.8269640924825" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-10: 5,740,904 руб.</title></rect><text x="313.33333333333337" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 313.33333333333337 202)">25-10</text><rect x="331.11111111111114" y="72.05044178967421" width="17.77777777777778" height="102.94955821032579" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-11: 4,257,267 руб.</title></rect><text x="340.00000000000006" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 340.00000000000006 202)">25-11</text><rect x="357.7777777777778" y="86.22435938050418" width="17.77777777777778" height="88.77564061949582" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2025-12: 3,671,134 руб.</title></rect><text x="366.66666666666674" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 366.66666666666674 202)">25-12</text><rect x="384.44444444444446" y="59.804510545205886" width="17.77777777777778" height="115.19548945479411" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-01: 4,763,673 руб.</title></rect><text x="393.33333333333337" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 393.33333333333337 202)">26-01</text><rect x="411.11111111111114" y="135.23412337555357" width="17.77777777777778" height="39.76587662444644" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-02: 1,644,436 руб.</title></rect><text x="420.00000000000006" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 420.00000000000006 202)">26-02</text><rect x="437.7777777777778" y="169.5257482994572" width="17.77777777777778" height="5.474251700542801" rx="3" fill="var(--accent)" fill-opacity="0.85"><title>2026-03: 226,376 руб.</title></rect><text x="446.66666666666674" y="202" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 446.66666666666674 202)">26-03</text>
     </svg>
     
-                <div class="card-expl">Суммарная выручка, сгенерированная каждой когортой за все доступные периоды жизни.</div>
+                <div class="card-expl">Суммарная выручка, сгенерированная каждой когортой за все доступные периоды жизни (руб.).</div>
             </div>
         </div>
 
@@ -941,14 +851,14 @@
             <div class="card-title">Каскад юнит-экономики (на 1 привлеченного клиента)</div>
             
         <div class="waterfall-bar-container">
-            <div class="w-segment" style="width: 48.29749042689732%; background: var(--positive);" title="Чистый LTV: 20,490 ₽ (48.3%)"></div>
-            <div class="w-segment" style="width: 3.1039128031482512%; background: var(--warning);" title="CAC: 1,317 ₽ (3.1%)"></div>
-            <div class="w-segment" style="width: 3.813848676030176%; background: #3B82F6;" title="Операционные: 1,618 ₽ (3.8%)"></div>
-            <div class="w-segment" style="width: 44.78474809392424%; background: var(--negative);" title="Себестоимость COGS: 18,999 ₽ (44.8%)"></div>
+            <div class="w-segment" style="width: 39.8140111758784%; background: var(--positive);" title="Чистый LTV: 17,899 ₽ (39.8%)"></div>
+            <div class="w-segment" style="width: 11.51215124315076%; background: var(--warning);" title="CAC: 5,176 ₽ (11.5%)"></div>
+            <div class="w-segment" style="width: 3.838822141958835%; background: #3B82F6;" title="Операционные: 1,726 ₽ (3.8%)"></div>
+            <div class="w-segment" style="width: 44.83501543901201%; background: var(--negative);" title="Себестоимость COGS: 20,157 ₽ (44.8%)"></div>
         </div>
         <div class="waterfall-legend">
-            <div><span class="w-dot" style="background: var(--positive);"></span>Чистая прибыль (48.3%)</div>
-            <div><span class="w-dot" style="background: var(--warning);"></span>Маркетинг CAC (3.1%)</div>
+            <div><span class="w-dot" style="background: var(--positive);"></span>Чистая прибыль (39.8%)</div>
+            <div><span class="w-dot" style="background: var(--warning);"></span>Маркетинг CAC (11.5%)</div>
             <div><span class="w-dot" style="background: #3B82F6;"></span>Доставка и эквайринг (3.8%)</div>
             <div><span class="w-dot" style="background: var(--negative);"></span>Себестоимость COGS (44.8%)</div>
         </div>
@@ -960,13 +870,13 @@
                     </thead>
                     <tbody>
                         
-        <tr><td><strong>Базовый LTV</strong></td><td class="tabular" style="font-weight:600;">42,423.55 ₽</td><td class="tabular">100.0%</td><td>Выручка с привлеченного клиента за весь срок жизни</td></tr>
-        <tr><td>Себестоимость товаров (COGS)</td><td class="tabular">−18,999.28 ₽</td><td class="tabular">44.8%</td><td>Себестоимость по принципу начисления</td></tr>
-        <tr class="row-subtotal"><td><strong>Прямой LTV 1 (Валовая прибыль)</strong></td><td class="tabular" style="font-weight:600;">23,424.27 ₽</td><td class="tabular">55.2%</td><td>Валовая прибыль до вычета логистики и эквайринга</td></tr>
-        <tr><td>Операционные расходы (логистика + эквайринг)</td><td class="tabular">−1,617.97 ₽</td><td class="tabular">3.8%</td><td>Прямые переменные расходы на обслуживание заказов</td></tr>
-        <tr class="row-subtotal"><td><strong>Прямой LTV 2 (Вкладная маржа)</strong></td><td class="tabular" style="font-weight:600;">21,806.30 ₽</td><td class="tabular">51.4%</td><td>Вкладная маржа (Contribution Margin)</td></tr>
-        <tr><td>Стоимость привлечения (CAC)</td><td class="tabular">−1,316.79 ₽</td><td class="tabular">3.1%</td><td>Маркетинговые затраты на 1 клиента</td></tr>
-        <tr class="row-highlight"><td><strong>Чистый LTV</strong></td><td class="tabular" style="font-weight:700; color: var(--positive);">20,489.51 ₽</td><td class="tabular" style="font-weight:700; color: var(--positive);">48.3%</td><td><strong>Чистая прибыль бизнеса</strong> с клиента после маркетинга</td></tr>
+        <tr><td><strong>Базовый LTV</strong></td><td class="tabular" style="font-weight:600;">44,957.54 ₽</td><td class="tabular">100.0%</td><td>Выручка с привлеченного клиента за весь срок жизни</td></tr>
+        <tr><td>Себестоимость товаров (COGS)</td><td class="tabular">−20,156.72 ₽</td><td class="tabular">44.8%</td><td>Себестоимость по принципу начисления</td></tr>
+        <tr class="row-subtotal"><td><strong>Прямой LTV 1 (Валовая прибыль)</strong></td><td class="tabular" style="font-weight:600;">24,800.82 ₽</td><td class="tabular">55.2%</td><td>Валовая прибыль до вычета логистики и эквайринга</td></tr>
+        <tr><td>Операционные расходы (логистика + эквайринг)</td><td class="tabular">−1,725.84 ₽</td><td class="tabular">3.8%</td><td>Прямые переменные расходы на обслуживание заказов</td></tr>
+        <tr class="row-subtotal"><td><strong>Прямой LTV 2 (Вкладная маржа)</strong></td><td class="tabular" style="font-weight:600;">23,074.98 ₽</td><td class="tabular">51.3%</td><td>Вкладная маржа (Contribution Margin)</td></tr>
+        <tr><td>Стоимость привлечения (CAC)</td><td class="tabular">−5,175.58 ₽</td><td class="tabular">11.5%</td><td>Маркетинговые затраты на 1 клиента</td></tr>
+        <tr class="row-highlight"><td><strong>Чистый LTV</strong></td><td class="tabular" style="font-weight:700; color: var(--positive);">17,899.40 ₽</td><td class="tabular" style="font-weight:700; color: var(--positive);">39.8%</td><td><strong>Чистая прибыль бизнеса</strong> с клиента после маркетинга</td></tr>
         
                     </tbody>
                 </table>
@@ -985,8 +895,8 @@
                 <div style="display:flex; justify-content:center; margin-bottom:14px;">
                     
     <svg viewBox="0 0 220 220" width="220" height="220">
-        <path d="M 110.0 25.0 A 85 85 0 0 1 194.98185188112996 108.24362565103966 L 164.9882570995547 108.86352248008448 A 55 55 0 0 0 110.0 55.0 Z" fill="var(--accent)"><title>1. VIP / Champions: 24.81% (363 чел.)</title></path><path d="M 194.99394309571392 108.98528967555129 A 85 85 0 0 1 147.86838581512427 186.0985240051139 L 134.50307317449216 159.2402214150737 A 55 55 0 0 0 164.99608082663843 109.34342273123906 Z" fill="var(--positive)"><title>2. Loyal Customers: 17.98% (263 чел.)</title></path><path d="M 147.20286743192315 186.4260862195805 A 85 85 0 0 1 104.71018594857638 194.83523953700703 L 106.57717914319649 164.8933902886516 A 55 55 0 0 0 134.07244363242086 159.45217343619913 Z" fill="#3B82F6"><title>3. Potential Loyalists: 8.34% (122 чел.)</title></path><path d="M 103.9700696391538 194.78584752093565 A 85 85 0 0 1 32.61642180371719 145.16790902996343 L 59.928272931817006 132.7557058429175 A 55 55 0 0 0 106.09828035474658 164.8614307488407 Z" fill="var(--warning)"><title>4. Customers at Risk: 17.22% (252 чел.)</title></path><path d="M 32.3124743267048 144.491279401627 A 85 85 0 0 1 109.25824448263825 25.00323653954544 L 109.52004054758946 55.00209423147058 A 55 55 0 0 0 59.73160103492663 132.317886671641 Z" fill="var(--negative)"><title>5. Hibernating / Lost: 31.65% (463 чел.)</title></path>
-        <text x="110" y="106" font-size="16" font-weight="600" fill="var(--text)" text-anchor="middle">1463</text>
+        <path d="M 110.0 25.0 A 85 85 0 0 1 193.53527960965064 94.28831452270364 L 164.052239747421 99.83361527939648 A 55 55 0 0 0 110.0 55.0 Z" fill="var(--accent)"><title>1. VIP / Champions: 22.18% (326 чел.)</title></path><path d="M 193.66920742322642 95.01788635842354 A 85 85 0 0 1 150.4280577709734 184.7701286936624 L 136.15933149886513 158.38067150766392 A 55 55 0 0 0 164.13889892091123 100.30569117309759 Z" fill="var(--positive)"><title>2. Loyal Customers: 20.07% (295 чел.)</title></path><path d="M 149.77403421214876 185.12007855753893 A 85 85 0 0 1 99.81782502387802 194.38793345470452 L 103.41153383897989 164.6039569412794 A 55 55 0 0 0 135.73613978433156 158.60710965487814 Z" fill="#3B82F6"><title>3. Potential Loyalists: 9.8% (144 чел.)</title></path><path d="M 99.08179843297427 194.29586510939785 A 85 85 0 0 1 29.720205523934766 137.93124771435615 L 58.05425063313426 128.07316028575985 A 55 55 0 0 0 102.93528133898334 164.54438330608096 Z" fill="var(--warning)"><title>4. Customers at Risk: 17.76% (261 чел.)</title></path><path d="M 29.479519307824162 137.22961970173176 A 85 85 0 0 1 109.31164966707419 25.00278725852735 L 109.55459684340094 55.00180352022358 A 55 55 0 0 0 57.898512493297986 127.61916568935585 Z" fill="var(--negative)"><title>5. Hibernating / Lost: 30.2% (444 чел.)</title></path>
+        <text x="110" y="106" font-size="16" font-weight="600" fill="var(--text)" text-anchor="middle">1,470</text>
         <text x="110" y="124" font-size="11" fill="var(--text-dim)" text-anchor="middle">клиентов</text>
     </svg>
     
@@ -999,52 +909,52 @@
                         
         <tr>
             <td><span class="rfm-dot" style="background: var(--accent);"></span><strong>1. VIP / Champions</strong></td>
-            <td class="tabular">363</td>
-            <td class="tabular">24.8%</td>
-            <td class="tabular" style="font-weight:600;">50.0%</td>
-            <td class="tabular">84 дн.</td>
-            <td class="tabular">4.5</td>
-            <td class="tabular">85,399 ₽</td>
+            <td class="tabular">326</td>
+            <td class="tabular">22.2%</td>
+            <td class="tabular" style="font-weight:600;">47.0%</td>
+            <td class="tabular">95 дн.</td>
+            <td class="tabular">5.0</td>
+            <td class="tabular">95,241 ₽</td>
         </tr>
         
         <tr>
             <td><span class="rfm-dot" style="background: var(--positive);"></span><strong>2. Loyal Customers</strong></td>
-            <td class="tabular">263</td>
-            <td class="tabular">18.0%</td>
-            <td class="tabular" style="font-weight:600;">17.5%</td>
-            <td class="tabular">216 дн.</td>
-            <td class="tabular">2.3</td>
-            <td class="tabular">41,214 ₽</td>
+            <td class="tabular">295</td>
+            <td class="tabular">20.1%</td>
+            <td class="tabular" style="font-weight:600;">19.9%</td>
+            <td class="tabular">227 дн.</td>
+            <td class="tabular">2.5</td>
+            <td class="tabular">44,578 ₽</td>
         </tr>
         
         <tr>
             <td><span class="rfm-dot" style="background: #3B82F6;"></span><strong>3. Potential Loyalists</strong></td>
-            <td class="tabular">122</td>
-            <td class="tabular">8.3%</td>
-            <td class="tabular" style="font-weight:600;">3.6%</td>
-            <td class="tabular">178 дн.</td>
+            <td class="tabular">144</td>
+            <td class="tabular">9.8%</td>
+            <td class="tabular" style="font-weight:600;">4.0%</td>
+            <td class="tabular">184 дн.</td>
             <td class="tabular">1.0</td>
-            <td class="tabular">18,335 ₽</td>
+            <td class="tabular">18,548 ₽</td>
         </tr>
         
         <tr>
             <td><span class="rfm-dot" style="background: var(--warning);"></span><strong>4. Customers at Risk</strong></td>
-            <td class="tabular">252</td>
-            <td class="tabular">17.2%</td>
-            <td class="tabular" style="font-weight:600;">14.6%</td>
-            <td class="tabular">401 дн.</td>
-            <td class="tabular">2.0</td>
-            <td class="tabular">35,961 ₽</td>
+            <td class="tabular">261</td>
+            <td class="tabular">17.8%</td>
+            <td class="tabular" style="font-weight:600;">16.2%</td>
+            <td class="tabular">409 дн.</td>
+            <td class="tabular">2.2</td>
+            <td class="tabular">41,042 ₽</td>
         </tr>
         
         <tr>
             <td><span class="rfm-dot" style="background: var(--negative);"></span><strong>5. Hibernating / Lost</strong></td>
-            <td class="tabular">463</td>
-            <td class="tabular">31.6%</td>
-            <td class="tabular" style="font-weight:600;">14.4%</td>
-            <td class="tabular">387 дн.</td>
+            <td class="tabular">444</td>
+            <td class="tabular">30.2%</td>
+            <td class="tabular" style="font-weight:600;">12.9%</td>
+            <td class="tabular">393 дн.</td>
             <td class="tabular">1.0</td>
-            <td class="tabular">19,282 ₽</td>
+            <td class="tabular">19,157 ₽</td>
         </tr>
         
                     </tbody>
@@ -1053,21 +963,21 @@
             </div>
 
             <div class="card">
-                <div class="card-title">Самопроверка и детекция аномалий</div>
+                <div class="card-title">Самопроверка и аномалии</div>
                 <div style="margin-bottom: 16px;">
                     <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Самопроверка расчета Базового LTV:</div>
                     <div style="font-size:13px; color:var(--text); line-height:1.6;">
-                        • Накопительный факт (Σ Выручка / M0): <strong>42,423.55 ₽</strong><br>
-                        • По формуле (AOV × Freq × Lifetime): <strong>42,491.94 ₽</strong><br>
-                        • Расхождение: <strong>0.16%</strong>
+                        • Накопительный факт (Σ Выручка / M0): <strong>44,957.54 ₽</strong><br>
+                        • По формуле (AOV × Freq × Lifetime): <strong>45,196.22 ₽</strong><br>
+                        • Расхождение: <strong>0.53%</strong>
                     </div>
                 </div>
                 <div>
-                    <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Всплески удержания (отрицательный отвал):</div>
-                    <ul class="anomalies-list"><li>Отрицательный отвал в когорте **2025-01** на **M2**: вернулось **21** клиентов (на 9 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-01** на **M3**: вернулось **22** клиентов (на 1 больше, чем в M2).</li><li>Отрицательный отвал в когорте **2025-01** на **M5**: вернулось **14** клиентов (на 2 больше, чем в M4).</li><li>Отрицательный отвал в когорте **2025-01** на **M6**: вернулось **17** клиентов (на 3 больше, чем в M5).</li><li>Отрицательный отвал в когорте **2025-01** на **M8**: вернулось **9** клиентов (на 3 больше, чем в M7).</li><li>Отрицательный отвал в когорте **2025-02** на **M2**: вернулось **26** клиентов (на 11 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-02** на **M3**: вернулось **27** клиентов (на 1 больше, чем в M2).</li><li>Отрицательный отвал в когорте **2025-02** на **M5**: вернулось **23** клиентов (на 4 больше, чем в M4).</li><li>Отрицательный отвал в когорте **2025-02** на **M8**: вернулось **14** клиентов (на 6 больше, чем в M7).</li><li>Отрицательный отвал в когорте **2025-03** на **M2**: вернулось **26** клиентов (на 4 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-04** на **M2**: вернулось **24** клиентов (на 13 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-04** на **M6**: вернулось **11** клиентов (на 2 больше, чем в M5).</li><li>Отрицательный отвал в когорте **2025-05** на **M2**: вернулось **28** клиентов (на 10 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-05** на **M5**: вернулось **22** клиентов (на 4 больше, чем в M4).</li><li>Отрицательный отвал в когорте **2025-06** на **M2**: вернулось **23** клиентов (на 14 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-06** на **M5**: вернулось **14** клиентов (на 1 больше, чем в M4).</li><li>Отрицательный отвал в когорте **2025-06** на **M7**: вернулось **14** клиентов (на 9 больше, чем в M6).</li><li>Отрицательный отвал в когорте **2025-07** на **M3**: вернулось **30** клиентов (на 2 больше, чем в M2).</li><li>Отрицательный отвал в когорте **2025-07** на **M5**: вернулось **23** клиентов (на 6 больше, чем в M4).</li><li>Отрицательный отвал в когорте **2025-07** на **M8**: вернулось **13** клиентов (на 4 больше, чем в M7).</li><li>Отрицательный отвал в когорте **2025-08** на **M2**: вернулось **21** клиентов (на 7 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-08** на **M6**: вернулось **10** клиентов (на 1 больше, чем в M5).</li><li>Отрицательный отвал в когорте **2025-09** на **M2**: вернулось **24** клиентов (на 13 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-09** на **M4**: вернулось **20** клиентов (на 3 больше, чем в M3).</li><li>Отрицательный отвал в когорте **2025-10** на **M2**: вернулось **33** клиентов (на 13 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-10** на **M5**: вернулось **23** клиентов (на 1 больше, чем в M4).</li><li>Отрицательный отвал в когорте **2025-10** на **M8**: вернулось **15** клиентов (на 2 больше, чем в M7).</li><li>Отрицательный отвал в когорте **2025-11** на **M2**: вернулось **24** клиентов (на 14 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-11** на **M7**: вернулось **9** клиентов (на 3 больше, чем в M6).</li><li>Отрицательный отвал в когорте **2025-12** на **M2**: вернулось **20** клиентов (на 10 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2025-12** на **M3**: вернулось **24** клиентов (на 4 больше, чем в M2).</li><li>Отрицательный отвал в когорте **2026-01** на **M2**: вернулось **31** клиентов (на 17 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2026-02** на **M2**: вернулось **14** клиентов (на 5 больше, чем в M1).</li><li>Отрицательный отвал в когорте **2026-02** на **M4**: вернулось **10** клиентов (на 1 больше, чем в M3).</li></ul>
+                    <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Выраженные всплески активности (рост > 1.5x):</div>
+                    <ul class="anomalies-list"><li>Отрицательный отвал в когорте <strong>2025-10</strong> на <strong>M2</strong>: вернулось <strong>45</strong> клиентов (рост в <strong>2.0x</strong>, на 22 больше, чем в M1).</li><li>Отрицательный отвал в когорте <strong>2025-05</strong> на <strong>M2</strong>: вернулось <strong>38</strong> клиентов (рост в <strong>2.1x</strong>, на 20 больше, чем в M1).</li><li>Отрицательный отвал в когорте <strong>2026-01</strong> на <strong>M2</strong>: вернулось <strong>43</strong> клиентов (рост в <strong>1.6x</strong>, на 16 больше, чем в M1).</li><li>Отрицательный отвал в когорте <strong>2025-03</strong> на <strong>M2</strong>: вернулось <strong>39</strong> клиентов (рост в <strong>1.6x</strong>, на 14 больше, чем в M1).</li><li>Отрицательный отвал в когорте <strong>2025-10</strong> на <strong>M7</strong>: вернулось <strong>11</strong> клиентов (рост в <strong>2.8x</strong>, на 7 больше, чем в M6).</li><li style='color: var(--text-dim); list-style-type: none;'>...и ещё 6 менее выраженных всплесков активности.</li></ul>
                 </div>
                 <div class="card-expl">
-                    Отрицательный отвал указывает на сезонные всплески повторных покупок или реактивацию спящих клиентов CRM-рассылками.
+                    Отрицательный отвал указывает на сезонность спроса или реактивацию спящих клиентов CRM-рассылками.
                 </div>
             </div>
         </div>

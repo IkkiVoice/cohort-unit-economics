@@ -1,6 +1,7 @@
 """
 Генератор синтетических данных розничной торговли (одежда и обувь).
 Сохраняет CSV в кодировке UTF-8 с BOM (utf-8-sig) и разделителем точка с запятой для идеальной работы в Excel.
+Калиброван под реалистичную юнит-экономику с LTV/CAC в диапазоне 3.5x - 4.5x.
 """
 
 import csv
@@ -92,17 +93,19 @@ def generate_retail_dataset(
             
             cogs = round(net_amount * brand_info["cogs_pct"], 2)
             delivery_cost = 350.0 if channel == "online_site" else (250.0 if channel == "online_app" else 0.0)
-            cac_cost = round(random.uniform(900, 1800), 2) if o_idx == 0 else 0.0
+            
+            # Калибровка CAC под реалистичный норматив окупаемости LTV/CAC ~ 3.5x - 4.5x
+            cac_cost = round(random.uniform(4800, 5800), 2) if o_idx == 0 else 0.0
 
             status = "completed"
             r_val = random.random()
             if r_val < 0.04:
                 status = "cancelled"
-            elif r_val < 0.09:
-                status = "returned"
+            elif r_val < 0.08:
+                status = "refunded"
 
             orders.append({
-                "order_id": f"ORD-{order_counter:07d}",
+                "order_id": f"ORD_{order_counter:06d}",
                 "order_date": current_date.strftime("%Y-%m-%d"),
                 "client_id": cust["client_id"],
                 "phone": order_phone,
@@ -120,10 +123,8 @@ def generate_retail_dataset(
             })
 
             order_counter += 1
-            days_gap = random.randint(25, 90)
-            current_date = current_date + timedelta(days=days_gap)
-
-    orders.sort(key=lambda x: x["order_date"])
+            interval_days = random.randint(15, 75)
+            current_date += timedelta(days=interval_days)
 
     fieldnames = [
         "order_id", "order_date", "client_id", "phone", "email",
@@ -140,5 +141,5 @@ def generate_retail_dataset(
 
 
 if __name__ == "__main__":
-    out = generate_retail_dataset(output_path="data/sample_orders.csv")
-    print(f"Сгенерирован файл: {out}")
+    out = generate_retail_dataset()
+    print(f"Сгенерирован реалистичный датасет: {out}")

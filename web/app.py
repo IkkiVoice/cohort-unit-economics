@@ -1,7 +1,7 @@
 """
 Локальный веб-интерфейс (web/app.py) для загрузки выгрузок и мгновенного расчета когортного анализа.
 Стек: Flask, без тяжелых внешних зависимостей.
-Дизайн: Стиль Mindbox (#0B0F19, #151C2C, #6366F1, темная и светлая темы).
+Дизайн: Стиль Mindbox в глубокой темной теме (#0B0F19, #151C2C, #6366F1).
 """
 
 import os
@@ -72,8 +72,8 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.1s; }
         body {
             font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg) !important;
+            color: var(--text) !important;
             font-size: 14px;
             line-height: 1.5;
             padding: 40px 16px;
@@ -91,35 +91,35 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 32px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
             position: relative;
         }
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         .logo-tag {
             display: inline-block;
             background: var(--badge-bg);
             color: var(--accent);
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
         }
         .theme-toggle {
-            background: var(--surface);
+            background: var(--sample-bg);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 500;
         }
-        .theme-toggle:hover { background: var(--border); }
+        .theme-toggle:hover { background: var(--sample-hover); }
         h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
         .subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; }
         
@@ -135,7 +135,7 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
         }
         .drop-zone:hover, .drop-zone.dragover {
             border-color: var(--accent);
-            background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+            background: #1E1B4B;
         }
         .drop-icon { font-size: 36px; margin-bottom: 12px; }
         .drop-text { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
@@ -151,7 +151,7 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
             margin-top: 16px;
             background: var(--sample-bg);
             color: var(--text);
-            padding: 9px 18px;
+            padding: 10px 20px;
             border-radius: 8px;
             text-decoration: none;
             font-size: 13px;
@@ -172,18 +172,18 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
         }
         .info-title { font-weight: 600; margin-bottom: 6px; color: var(--text); }
         .cols-list { color: var(--text-dim); line-height: 1.6; }
-        code { background: var(--sample-bg); padding: 2px 5px; border-radius: 4px; color: var(--accent); }
+        code { background: var(--sample-bg); padding: 2px 6px; border-radius: 4px; color: var(--accent); font-family: monospace; }
         
         .error-card {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
             border-radius: 12px;
             padding: 18px;
             margin-bottom: 20px;
-            color: var(--negative);
+            color: #FCA5A5;
             font-size: 13px;
         }
-        .error-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+        .error-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; color: var(--negative); }
     </style>
 </head>
 <body>
@@ -326,9 +326,10 @@ def process_dataset_and_generate_html(filepath: str, original_filename: str) -> 
         cohort_matrix=cohort_clients,
         rfm_summary=rfm_summary,
         clean_df=clean_df,
+        cohort_revenue=cohort_revenue,
         output_path=out_html_path,
         source_filename=original_filename,
-        engine_name="Web Fast Engine (Pandas)"
+        engine_name="Pandas"
     )
 
     with open(out_html_path, "r", encoding="utf-8") as f:
@@ -430,12 +431,13 @@ def view_report(report_id):
     data = TEMP_REPORTS[report_id]
     html_code = data["html"]
     
+    # Фиксированная верхняя панель без перекрытия контента
     top_nav = f"""
-    <div style="position: sticky; top: 0; z-index: 9999; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
+    <div style="background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; margin-bottom: 24px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.25);">
         <a href="/" style="text-decoration: none; color: var(--accent); font-weight: 500; font-size: 13px; display: flex; align-items: center; gap: 6px;">
             ← Загрузить другой файл
         </a>
-        <div style="display: flex; gap: 12px; align-items: center;">
+        <div style="display: flex; gap: 14px; align-items: center;">
             <span style="font-size: 13px; color: var(--text-dim);">Файл: <strong style="color: var(--text);">{data['filename']}</strong></span>
             <a href="/download/{report_id}" style="text-decoration: none; background: var(--accent); color: #FFFFFF; padding: 6px 14px; border-radius: 6px; font-weight: 500; font-size: 13px; display: inline-block;">
                 📥 Скачать HTML-отчет
@@ -444,7 +446,8 @@ def view_report(report_id):
     </div>
     """
     
-    injected_html = html_code.replace("<body>", f"<body>\n{top_nav}")
+    # Вставляем аккуратно внутрь <div class="container"> перед первым блоком
+    injected_html = html_code.replace('<div class="container">', f'<div class="container">\n{top_nav}')
     return Response(injected_html, mimetype="text/html")
 
 
@@ -463,7 +466,7 @@ def download_report(report_id):
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("   COHORT & UNIT ECONOMICS LOCAL WEB SERVER")
+    print("   COHORT & UNIT ECONOMICS LOCAL WEB SERVER (DARK MODE)")
     print("   Слушает: http://127.0.0.1:5000")
     print("=" * 60)
     app.run(host="127.0.0.1", port=5000, debug=False)
