@@ -1,12 +1,12 @@
 """
 Генератор автономного HTML-дашборда (report_html.py) в стиле Mindbox.
+Поддерживает светлую и темную темы (Dark Mode) с переключателем и сохранением в localStorage.
 - 100% самодостаточный HTML (инлайн CSS, SVG-графики, 0 внешних CDN-ссылок)
-- Палитра: #F7F8FA, #FFFFFF, #E8EAEF, #16182B, #4A3AFF, #00B856, #F5A623, #E5484D
-- 4 KPI-карточки со светофором
-- Тепловая карта удержания (Heatmap M0-M8) с прочерками для ненаступивших периодов
-- Автономные SVG-графики (кривая удержания, выручка когорт, RFM donut)
-- Каскад маржинальности юнит-экономики
-- Профессиональные пояснения для бизнеса
+- Палитра Dark: #0B0F19 (фон), #151C2C (карточки), #232D42 (бордеры), #F1F5F9 (текст), #6366F1 (акцент)
+- Палитра Light: #F7F8FA (фон), #FFFFFF (карточки), #E8EAEF (бордеры), #16182B (текст), #4A3AFF (акцент)
+- Адаптивная тепловая карта через CSS color-mix (автоматически идеальна в обеих темах)
+- Автономные SVG-графики со стилизацией через CSS-переменные
+- Каскад маржинальности юнит-экономики и RFM-сегментация
 """
 
 import pandas as pd
@@ -16,21 +16,8 @@ from typing import Dict, Any, List, Optional
 from src.report import detect_data_completeness, detect_retention_anomalies
 
 
-def interpolate_color(val_pct: float) -> str:
-    """Интерполирует цвет от #F7F8FA (0%) до #4A3AFF (100%)."""
-    # RGB для #F7F8FA: 247, 248, 250
-    # RGB для #4A3AFF: 74, 58, 255
-    ratio = max(0.0, min(1.0, val_pct / 100.0))
-    # Нелинейная кривая для лучшей контрастности на малых процентах (5-20%)
-    ratio_adj = math.pow(ratio, 0.75)
-    r = int(247 + (74 - 247) * ratio_adj)
-    g = int(248 + (58 - 248) * ratio_adj)
-    b = int(250 + (255 - 250) * ratio_adj)
-    return f"rgb({r}, {g}, {b})"
-
-
 def generate_retention_curve_svg(avg_ret_series: pd.Series, cols: List[int]) -> str:
-    """Генерирует чистый SVG-график кривой среднего удержания."""
+    """Генерирует чистый SVG-график кривой среднего удержания, адаптирующийся под тему."""
     w, h = 480, 220
     pad_l, pad_r, pad_t, pad_b = 45, 20, 25, 35
     plot_w = w - pad_l - pad_r
@@ -44,35 +31,32 @@ def generate_retention_curve_svg(avg_ret_series: pd.Series, cols: List[int]) -> 
         y = pad_t + plot_h - (val / max_val) * plot_h
         points.append((x, y, val, p))
 
-    # Сетка и оси
     grid_lines = []
     for y_val in [0, 25, 50, 75, 100]:
         y_pos = pad_t + plot_h - (y_val / max_val) * plot_h
         grid_lines.append(
-            f'<line x1="{pad_l}" y1="{y_pos}" x2="{w - pad_r}" y2="{y_pos}" stroke="#E8EAEF" stroke-width="1" stroke-dasharray="3,3" />'
-            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="#6B7280" text-anchor="end">{y_val}%</text>'
+            f'<line x1="{pad_l}" y1="{y_pos}" x2="{w - pad_r}" y2="{y_pos}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />'
+            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="var(--text-dim)" text-anchor="end">{y_val}%</text>'
         )
 
-    # Ось X
     for x, y, val, p in points:
-        grid_lines.append(f'<text x="{x}" y="{h - 12}" font-size="11" fill="#6B7280" text-anchor="middle">M{p}</text>')
+        grid_lines.append(f'<text x="{x}" y="{h - 12}" font-size="11" fill="var(--text-dim)" text-anchor="middle">M{p}</text>')
 
-    # Линия и область заливки
     pts_str = " ".join([f"{x},{y}" for x, y, _, _ in points])
     area_pts = f"{pad_l},{pad_t + plot_h} " + pts_str + f" {points[-1][0]},{pad_t + plot_h}"
 
     dots = []
     for x, y, val, p in points:
         dots.append(
-            f'<circle cx="{x}" cy="{y}" r="4" fill="#4A3AFF" stroke="#FFFFFF" stroke-width="2" />'
+            f'<circle cx="{x}" cy="{y}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" />'
             f'<title>M{p}: {val:.1f}%</title>'
         )
 
     return f"""
     <svg viewBox="0 0 {w} {h}" width="100%" height="{h}" class="chart-svg">
         {''.join(grid_lines)}
-        <polygon points="{area_pts}" fill="#4A3AFF" fill-opacity="0.08" />
-        <polyline points="{pts_str}" fill="none" stroke="#4A3AFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <polygon points="{area_pts}" fill="var(--accent)" fill-opacity="0.15" />
+        <polyline points="{pts_str}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
         {''.join(dots)}
     </svg>
     """
@@ -85,7 +69,6 @@ def generate_revenue_bars_svg(cohort_rev_df: pd.DataFrame) -> str:
     plot_w = w - pad_l - pad_r
     plot_h = h - pad_t - pad_b
 
-    # Суммарная выручка по каждой когорте
     rev_by_cohort = cohort_rev_df.sum(axis=1)
     cohorts = list(rev_by_cohort.index)
     if not cohorts:
@@ -100,8 +83,8 @@ def generate_revenue_bars_svg(cohort_rev_df: pd.DataFrame) -> str:
         val = (max_rev / 3) * step
         y_pos = pad_t + plot_h - (val / max_rev) * plot_h
         grid_lines.append(
-            f'<line x1="{pad_l}" y1="{y_pos}" x2="{w - pad_r}" y2="{y_pos}" stroke="#E8EAEF" stroke-width="1" stroke-dasharray="3,3" />'
-            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="#6B7280" text-anchor="end">{int(val/1000)}k</text>'
+            f'<line x1="{pad_l}" y1="{y_pos}" x2="{w - pad_r}" y2="{y_pos}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3" />'
+            f'<text x="{pad_l - 8}" y="{y_pos + 4}" font-size="11" fill="var(--text-dim)" text-anchor="end">{int(val/1000)}k</text>'
         )
 
     bars = []
@@ -110,11 +93,11 @@ def generate_revenue_bars_svg(cohort_rev_df: pd.DataFrame) -> str:
         b_h = (r_val / max_rev) * plot_h
         x = pad_l + i * gap + (gap - bar_width) / 2
         y = pad_t + plot_h - b_h
-        label = str(c)[2:]  # 21-02
+        label = str(c)[2:]
         bars.append(
-            f'<rect x="{x}" y="{y}" width="{bar_width}" height="{b_h}" rx="3" fill="#4A3AFF" fill-opacity="0.85">'
+            f'<rect x="{x}" y="{y}" width="{bar_width}" height="{b_h}" rx="3" fill="var(--accent)" fill-opacity="0.85">'
             f'<title>{c}: {r_val:,.0f} руб.</title></rect>'
-            f'<text x="{x + bar_width/2}" y="{h - 18}" font-size="10" fill="#6B7280" text-anchor="middle" transform="rotate(-30 {x + bar_width/2} {h - 18})">{label}</text>'
+            f'<text x="{x + bar_width/2}" y="{h - 18}" font-size="10" fill="var(--text-dim)" text-anchor="middle" transform="rotate(-30 {x + bar_width/2} {h - 18})">{label}</text>'
         )
 
     return f"""
@@ -129,7 +112,7 @@ def generate_rfm_donut_svg(rfm_summary: pd.DataFrame) -> str:
     """Генерирует кольцевую SVG диаграмму RFM-сегментов."""
     size = 220
     cx, cy, r_out, r_in = 110, 110, 85, 55
-    colors = ["#4A3AFF", "#00B856", "#3B82F6", "#F5A623", "#E5484D"]
+    colors = ["var(--accent)", "var(--positive)", "#3B82F6", "var(--warning)", "var(--negative)"]
     
     total_clients = rfm_summary["client_count"].sum()
     if total_clients == 0:
@@ -145,7 +128,7 @@ def generate_rfm_donut_svg(rfm_summary: pd.DataFrame) -> str:
             continue
             
         start_rad = math.radians(current_angle)
-        end_rad = math.radians(current_angle + angle - 0.5)  # 0.5 deg gap
+        end_rad = math.radians(current_angle + angle - 0.5)
         
         x1_out = cx + r_out * math.cos(start_rad)
         y1_out = cy + r_out * math.sin(start_rad)
@@ -175,8 +158,8 @@ def generate_rfm_donut_svg(rfm_summary: pd.DataFrame) -> str:
     return f"""
     <svg viewBox="0 0 {size} {size}" width="{size}" height="{size}">
         {''.join(paths)}
-        <text x="{cx}" y="{cy - 4}" font-size="16" font-weight="600" fill="#16182B" text-anchor="middle">{total_clients}</text>
-        <text x="{cx}" y="{cy + 14}" font-size="11" fill="#6B7280" text-anchor="middle">клиентов</text>
+        <text x="{cx}" y="{cy - 4}" font-size="16" font-weight="600" fill="var(--text)" text-anchor="middle">{total_clients}</text>
+        <text x="{cx}" y="{cy + 14}" font-size="11" fill="var(--text-dim)" text-anchor="middle">клиентов</text>
     </svg>
     """
 
@@ -193,12 +176,12 @@ def generate_html_report(
     engine_name: str = "Pandas Core Engine"
 ) -> str:
     """
-    Формирует красивый автономный HTML-отчет в дизайн-системе Mindbox.
+    Формирует красивый автономный HTML-отчет в дизайн-системе Mindbox с поддержкой Dark Mode.
     """
     now_str = datetime.now().strftime("%d.%m.%Y в %H:%M")
     total_orders = len(clean_df) if clean_df is not None else 0
 
-    # 1. Определение полноты данных
+    # 1. Полнота данных
     completeness = detect_data_completeness(clean_df) if clean_df is not None else {
         "cogs": model_results.get("direct_ltv_1") is not None,
         "acquisition_cost": model_results.get("ltv_to_cac_ratio") is not None,
@@ -226,7 +209,6 @@ def generate_html_report(
     # 3. Карточки KPI
     kpi_cards_html = []
     if is_full:
-        # Full Mode: Базовый LTV, Чистый LTV, CAC, LTV / CAC
         ratio = model_results["ltv_to_cac_ratio"]
         ratio_color = "var(--positive)" if ratio >= 3.0 else ("var(--warning)" if ratio >= 2.0 else "var(--negative)")
         
@@ -237,7 +219,6 @@ def generate_html_report(
             {"title": "Отношение LTV к CAC", "val": f"{ratio:.2f}x", "sub": "Возврат инвестиций (норматив ≥ 3.0x)", "color": ratio_color}
         ]
     else:
-        # Partial Mode: Базовый LTV, Средний чек, Частота, Срок жизни
         cards_data = [
             {"title": "Базовый LTV", "val": f"{model_results['basic_ltv']:,.0f} ₽", "sub": "Выручка с привлеченного клиента за весь срок жизни", "color": "var(--text)"},
             {"title": "Средний чек (AOV)", "val": f"{behavior_metrics['overall_aov']:,.0f} ₽", "sub": "Средняя сумма одной покупки", "color": "var(--text)"},
@@ -254,7 +235,7 @@ def generate_html_report(
         </div>
         """)
 
-    # 4. Тепловая карта удержания (Heatmap M0-M8)
+    # 4. Тепловая карта удержания (Heatmap M0-M8) с адаптивным color-mix
     heatmap_rows = []
     for c in cohort_matrix.index:
         max_p = availability.get(str(c), 8)
@@ -267,12 +248,12 @@ def generate_html_report(
             else:
                 val = cohort_matrix.loc[c, p] if p in cohort_matrix.columns else 0
                 pct = (val / base_size * 100.0) if base_size > 0 else 0.0
-                bg = interpolate_color(pct)
-                text_color = "#FFFFFF" if pct > 38.0 else "#16182B"
+                mix_pct = min(100.0, pct * 1.1)
+                text_cls = "text-white" if pct > 38.0 else ""
                 cells_html.append(f"""
-                <td class="heat-cell" style="background-color: {bg}; color: {text_color};">
+                <td class="heat-cell {text_cls}" style="background-color: color-mix(in srgb, var(--accent) {mix_pct:.1f}%, var(--heat-base));">
                     <div class="pct-val">{pct:.1f}%</div>
-                    <div class="abs-val" style="color: {text_color}; opacity: 0.85;">{int(val)}</div>
+                    <div class="abs-val">{int(val)}</div>
                 </td>
                 """)
         heatmap_rows.append(f"<tr>{''.join(cells_html)}</tr>")
@@ -299,7 +280,7 @@ def generate_html_report(
 
     # SVG Графики
     ret_curve_svg = generate_retention_curve_svg(avg_ret_series, cols)
-    cohort_rev_df = cohort_matrix.copy()  # Для выручки используем ту же структуру
+    cohort_rev_df = cohort_matrix.copy()
     rev_bars_svg = generate_revenue_bars_svg(cohort_rev_df)
     rfm_donut_svg = generate_rfm_donut_svg(rfm_summary)
 
@@ -313,7 +294,7 @@ def generate_html_report(
 
     # Таблица RFM
     rfm_rows_html = []
-    colors_rfm = ["#4A3AFF", "#00B856", "#3B82F6", "#F5A623", "#E5484D"]
+    colors_rfm = ["var(--accent)", "var(--positive)", "#3B82F6", "var(--warning)", "var(--negative)"]
     for idx, row in rfm_summary.iterrows():
         dot_color = colors_rfm[idx % len(colors_rfm)]
         rfm_rows_html.append(f"""
@@ -358,17 +339,17 @@ def generate_html_report(
         ue_rows_html = f"""
         <tr><td><strong>Базовый LTV</strong></td><td class="tabular" style="font-weight:600;">{basic_val:,.2f} ₽</td><td class="tabular">100.0%</td><td>Выручка с привлеченного клиента за весь срок жизни</td></tr>
         <tr><td>Себестоимость товаров (COGS)</td><td class="tabular">−{cogs_val:,.2f} ₽</td><td class="tabular">{cogs_pct:.1f}%</td><td>Себестоимость по принципу начисления</td></tr>
-        <tr style="background:#F7F8FA;"><td><strong>Прямой LTV 1 (Валовая прибыль)</strong></td><td class="tabular" style="font-weight:600;">{model_results['direct_ltv_1']:,.2f} ₽</td><td class="tabular">{model_results['gross_margin_pct']:.1f}%</td><td>Валовая прибыль до вычета логистики и эквайринга</td></tr>
+        <tr class="row-subtotal"><td><strong>Прямой LTV 1 (Валовая прибыль)</strong></td><td class="tabular" style="font-weight:600;">{model_results['direct_ltv_1']:,.2f} ₽</td><td class="tabular">{model_results['gross_margin_pct']:.1f}%</td><td>Валовая прибыль до вычета логистики и эквайринга</td></tr>
         <tr><td>Операционные расходы (логистика + эквайринг)</td><td class="tabular">−{opex_val:,.2f} ₽</td><td class="tabular">{opex_pct:.1f}%</td><td>Прямые переменные расходы на обслуживание заказов</td></tr>
-        <tr style="background:#F7F8FA;"><td><strong>Прямой LTV 2 (Вкладная маржа)</strong></td><td class="tabular" style="font-weight:600;">{model_results['direct_ltv_2']:,.2f} ₽</td><td class="tabular">{model_results['contribution_margin_pct']:.1f}%</td><td>Вкладная маржа (Contribution Margin)</td></tr>
+        <tr class="row-subtotal"><td><strong>Прямой LTV 2 (Вкладная маржа)</strong></td><td class="tabular" style="font-weight:600;">{model_results['direct_ltv_2']:,.2f} ₽</td><td class="tabular">{model_results['contribution_margin_pct']:.1f}%</td><td>Вкладная маржа (Contribution Margin)</td></tr>
         <tr><td>Стоимость привлечения (CAC)</td><td class="tabular">−{cac_val:,.2f} ₽</td><td class="tabular">{cac_pct:.1f}%</td><td>Маркетинговые затраты на 1 клиента</td></tr>
-        <tr style="background:#F0FDF4; border-top: 2px solid var(--positive);"><td><strong>Чистый LTV</strong></td><td class="tabular" style="font-weight:700; color: var(--positive);">{net_val:,.2f} ₽</td><td class="tabular" style="font-weight:700; color: var(--positive);">{net_pct:.1f}%</td><td><strong>Чистая прибыль бизнеса</strong> с клиента после маркетинга</td></tr>
+        <tr class="row-highlight"><td><strong>Чистый LTV</strong></td><td class="tabular" style="font-weight:700; color: var(--positive);">{net_val:,.2f} ₽</td><td class="tabular" style="font-weight:700; color: var(--positive);">{net_pct:.1f}%</td><td><strong>Чистая прибыль бизнеса</strong> с клиента после маркетинга</td></tr>
         """
         enrichment_box_html = ""
     else:
         cascade_bar_html = """
-        <div class="waterfall-bar-container" style="background:#E8EAEF;">
-            <div class="w-segment" style="width: 100%; background: #9CA3AF;" title="Только Базовая Выручка (нет данных о COGS/CAC)"></div>
+        <div class="waterfall-bar-container" style="background:var(--border);">
+            <div class="w-segment" style="width: 100%; background: var(--text-dim);" title="Только Базовая Выручка (нет данных о COGS/CAC)"></div>
         </div>
         <div class="text-dim" style="margin-top:8px;">* Водопад маржинальности доступен только при наличии полей себестоимости и маркетинга.</div>
         """
@@ -406,26 +387,53 @@ def generate_html_report(
         warning_banner_html = ""
 
     html_content = f"""<!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дашборд юнит-экономики | {source_filename}</title>
     <style>
         :root {{
+            --bg: #0B0F19;
+            --surface: #151C2C;
+            --border: #232D42;
+            --text: #F1F5F9;
+            --text-dim: #94A3B8;
+            --accent: #6366F1;
+            --accent-hover: #4F46E5;
+            --positive: #10B981;
+            --warning: #F59E0B;
+            --negative: #EF4444;
+            --heat-base: #151C2C;
+            --banner-bg: #422006;
+            --banner-border: #78350F;
+            --banner-text: #FDE68A;
+            --badge-bg: #1E1B4B;
+            --subtotal-bg: #1E293B;
+            --highlight-bg: #064E3B;
+            --enrichment-bg: #0F172A;
+        }}
+        [data-theme="light"] {{
             --bg: #F7F8FA;
             --surface: #FFFFFF;
             --border: #E8EAEF;
             --text: #16182B;
             --text-dim: #6B7280;
             --accent: #4A3AFF;
+            --accent-hover: #3B2ECC;
             --positive: #00B856;
             --warning: #F5A623;
             --negative: #E5484D;
-            --heat-0: #F7F8FA;
-            --heat-100: #4A3AFF;
+            --heat-base: #F7F8FA;
+            --banner-bg: #FFFBEB;
+            --banner-border: #FDE68A;
+            --banner-text: #92400E;
+            --badge-bg: #EEF2FF;
+            --subtotal-bg: #F7F8FA;
+            --highlight-bg: #F0FDF4;
+            --enrichment-bg: #F8FAFC;
         }}
-        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.1s; }}
         body {{
             font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
             background-color: var(--bg);
@@ -454,25 +462,40 @@ def generate_html_report(
         }}
         .header-title {{ font-size: 22px; font-weight: 600; color: var(--text); }}
         .header-meta {{ font-size: 13px; color: var(--text-dim); margin-top: 4px; }}
+        .header-controls {{ display: flex; gap: 12px; align-items: center; }}
         .engine-badge {{
-            background: #EEF2FF;
+            background: var(--badge-bg);
             color: var(--accent);
             padding: 6px 12px;
             border-radius: 6px;
             font-weight: 500;
             font-size: 13px;
         }}
+        .theme-toggle {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        .theme-toggle:hover {{ background: var(--border); }}
         /* Banner */
         .warning-banner {{
-            background: #FFFBEB;
-            border: 1px solid #FDE68A;
+            background: var(--banner-bg);
+            border: 1px solid var(--banner-border);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 20px;
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            color: #92400E;
+            color: var(--banner-text);
             font-size: 13px;
         }}
         .warning-icon {{ font-size: 18px; }}
@@ -525,7 +548,9 @@ def generate_html_report(
             border-bottom: 1px solid var(--border);
         }}
         table.data-table tr:last-child td {{ border-bottom: none; }}
-        .row-disabled {{ color: #9CA3AF; }}
+        .row-subtotal {{ background: var(--subtotal-bg); }}
+        .row-highlight {{ background: var(--highlight-bg); border-top: 2px solid var(--positive); }}
+        .row-disabled {{ color: var(--text-dim); opacity: 0.6; }}
         /* Heatmap */
         .heatmap-table {{
             width: 100%;
@@ -547,10 +572,12 @@ def generate_html_report(
             border-radius: 4px;
             min-width: 52px;
             font-variant-numeric: tabular-nums;
+            color: var(--text);
         }}
+        .heat-cell.text-white {{ color: #FFFFFF !important; }}
         .heat-empty {{ color: var(--text-dim); background: var(--surface); }}
         .pct-val {{ font-size: 12px; font-weight: 600; }}
-        .abs-val {{ font-size: 10px; margin-top: 2px; }}
+        .abs-val {{ font-size: 10px; margin-top: 2px; opacity: 0.85; }}
         .summary-cell {{ padding: 8px 4px; font-size: 12px; font-variant-numeric: tabular-nums; border-top: 1px solid var(--border); }}
         /* Waterfall */
         .waterfall-bar-container {{
@@ -559,6 +586,7 @@ def generate_html_report(
             border-radius: 6px;
             overflow: hidden;
             margin: 14px 0 10px 0;
+            background: var(--border);
         }}
         .w-segment {{ height: 100%; transition: width 0.3s ease; }}
         .waterfall-legend {{
@@ -572,7 +600,7 @@ def generate_html_report(
         .rfm-dot {{ display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }}
         .anomalies-list {{ margin: 8px 0 0 18px; font-size: 13px; color: var(--text); }}
         .anomalies-list li {{ margin-bottom: 4px; }}
-        .enrichment-card {{ background: #F8FAFC; border: 1px dashed var(--border); border-radius: 8px; padding: 14px; margin-top: 14px; }}
+        .enrichment-card {{ background: var(--enrichment-bg); border: 1px dashed var(--border); border-radius: 8px; padding: 14px; margin-top: 14px; }}
         @media (max-width: 900px) {{
             .grid-4 {{ grid-template-columns: 1fr 1fr; }}
             .grid-2 {{ grid-template-columns: 1fr; }}
@@ -590,7 +618,10 @@ def generate_html_report(
                 <div class="header-title">Аналитический дашборд юнит-экономики</div>
                 <div class="header-meta">Файл: <strong>{source_filename}</strong> • Обработано: <strong>{total_orders:,}</strong> заказов • Дата: {now_str}</div>
             </div>
-            <div class="engine-badge">⚡ {engine_name}</div>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Тёмная</button>
+                <div class="engine-badge">⚡ {engine_name}</div>
+            </div>
         </div>
 
         {warning_banner_html}
@@ -701,6 +732,34 @@ def generate_html_report(
             </div>
         </div>
     </div>
+
+    <script>
+        function applyTheme(theme) {{
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) {{
+                btn.innerHTML = theme === 'dark' ? '🌙 Тёмная' : '☀️ Светлая';
+            }}
+            try {{ localStorage.setItem('theme_preference', theme); }} catch(e) {{}}
+        }}
+        function toggleTheme() {{
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        }}
+        (function initTheme() {{
+            try {{
+                const saved = localStorage.getItem('theme_preference');
+                if (saved) {{
+                    applyTheme(saved);
+                }} else {{
+                    applyTheme('dark');
+                }}
+            }} catch(e) {{
+                applyTheme('dark');
+            }}
+        }})();
+    </script>
 </body>
 </html>
 """

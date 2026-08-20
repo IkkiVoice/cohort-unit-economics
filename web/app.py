@@ -1,7 +1,7 @@
 """
 Локальный веб-интерфейс (web/app.py) для загрузки выгрузок и мгновенного расчета когортного анализа.
 Стек: Flask, без тяжелых внешних зависимостей.
-Дизайн: Стиль Mindbox (#F7F8FA, #4A3AFF, карточки 12px).
+Дизайн: Стиль Mindbox (#0B0F19, #151C2C, #6366F1, темная и светлая темы).
 """
 
 import os
@@ -29,13 +29,30 @@ app.config["MAX_CONTENT_LENGTH"] = 64 * 1024 * 1024  # 64 MB
 TEMP_REPORTS = {}
 
 UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Когортный анализ и юнит-экономика | Загрузка данных</title>
     <style>
         :root {
+            --bg: #0B0F19;
+            --surface: #151C2C;
+            --border: #232D42;
+            --text: #F1F5F9;
+            --text-dim: #94A3B8;
+            --accent: #6366F1;
+            --accent-hover: #4F46E5;
+            --positive: #10B981;
+            --warning: #F59E0B;
+            --negative: #EF4444;
+            --drop-bg: #0F172A;
+            --drop-border: #334155;
+            --sample-bg: #1E293B;
+            --sample-hover: #334155;
+            --badge-bg: #1E1B4B;
+        }
+        [data-theme="light"] {
             --bg: #F7F8FA;
             --surface: #FFFFFF;
             --border: #E8EAEF;
@@ -46,8 +63,13 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
             --positive: #00B856;
             --warning: #F5A623;
             --negative: #E5484D;
+            --drop-bg: #FAFAFC;
+            --drop-border: #CBD5E1;
+            --sample-bg: #F1F5F9;
+            --sample-hover: #E2E8F0;
+            --badge-bg: #EEF2FF;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, border-color 0.2s, color 0.1s; }
         body {
             font-family: -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
             background-color: var(--bg);
@@ -69,36 +91,53 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 32px;
-            box-shadow: 0 4px 12px rgba(22, 24, 43, 0.03);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
         .logo-tag {
             display: inline-block;
-            background: #EEF2FF;
+            background: var(--badge-bg);
             color: var(--accent);
             padding: 4px 10px;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
-            margin-bottom: 12px;
         }
-        h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .theme-toggle:hover { background: var(--border); }
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
         .subtitle { font-size: 14px; color: var(--text-dim); margin-bottom: 24px; }
         
         .drop-zone {
-            border: 2px dashed #CBD5E1;
+            border: 2px dashed var(--drop-border);
             border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
-            background: #FAFAFC;
+            background: var(--drop-bg);
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
         }
         .drop-zone:hover, .drop-zone.dragover {
             border-color: var(--accent);
-            background: #F5F3FF;
+            background: color-mix(in srgb, var(--accent) 10%, var(--surface));
         }
-        .drop-icon { font-size: 36px; margin-bottom: 12px; color: var(--accent); }
+        .drop-icon { font-size: 36px; margin-bottom: 12px; }
         .drop-text { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
         .drop-sub { font-size: 13px; color: var(--text-dim); }
         input[type="file"] {
@@ -110,37 +149,38 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
         .btn-sample {
             display: inline-block;
             margin-top: 16px;
-            background: #F1F5F9;
-            color: #334155;
-            padding: 8px 16px;
+            background: var(--sample-bg);
+            color: var(--text);
+            padding: 9px 18px;
             border-radius: 8px;
             text-decoration: none;
             font-size: 13px;
             font-weight: 500;
-            border: none;
+            border: 1px solid var(--border);
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-sample:hover { background: #E2E8F0; }
+        .btn-sample:hover { background: var(--sample-hover); }
 
         .info-box {
             margin-top: 24px;
             padding: 16px;
-            background: #F8FAFC;
+            background: var(--drop-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
             font-size: 13px;
         }
         .info-title { font-weight: 600; margin-bottom: 6px; color: var(--text); }
         .cols-list { color: var(--text-dim); line-height: 1.6; }
+        code { background: var(--sample-bg); padding: 2px 5px; border-radius: 4px; color: var(--accent); }
         
         .error-card {
-            background: #FEF2F2;
-            border: 1px solid #FCA5A5;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
             border-radius: 12px;
             padding: 18px;
             margin-bottom: 20px;
-            color: #991B1B;
+            color: var(--negative);
             font-size: 13px;
         }
         .error-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
@@ -149,7 +189,10 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
 <body>
     <div class="container">
         <div class="card">
-            <span class="logo-tag">⚡ Cohort & Unit Economics</span>
+            <div class="header-row">
+                <span class="logo-tag">⚡ Cohort & Unit Economics</span>
+                <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Тёмная</button>
+            </div>
             <h1>Когортный анализ заказов</h1>
             <p class="subtitle">Перетащите CSV или XLSX выгрузку из 1C, RetailCRM или интернет-магазина для мгновенного расчета.</p>
 
@@ -158,7 +201,7 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="error-title">⚠️ Ошибка валидации файла</div>
                 <p>{{ error_msg }}</p>
                 {% if found_cols %}
-                <p style="margin-top:8px; color:#7F1D1D;"><strong>Найденные колонки:</strong> {{ found_cols }}</p>
+                <p style="margin-top:8px;"><strong>Найденные колонки:</strong> {{ found_cols }}</p>
                 {% endif %}
             </div>
             {% endif %}
@@ -202,6 +245,26 @@ UPLOAD_HTML_TEMPLATE = """<!DOCTYPE html>
                 dropZone.classList.remove('dragover');
             }, false);
         });
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const btn = document.getElementById('themeBtn');
+            if (btn) {
+                btn.innerHTML = theme === 'dark' ? '🌙 Тёмная' : '☀️ Светлая';
+            }
+            try { localStorage.setItem('theme_preference', theme); } catch(e) {}
+        }
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        }
+        (function initTheme() {
+            try {
+                const saved = localStorage.getItem('theme_preference');
+                if (saved) { applyTheme(saved); } else { applyTheme('dark'); }
+            } catch(e) { applyTheme('dark'); }
+        })();
     </script>
 </body>
 </html>
@@ -368,13 +431,13 @@ def view_report(report_id):
     html_code = data["html"]
     
     top_nav = f"""
-    <div style="position: sticky; top: 0; z-index: 9999; background: #FFFFFF; border-bottom: 1px solid #E8EAEF; padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-        <a href="/" style="text-decoration: none; color: #4A3AFF; font-weight: 500; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+    <div style="position: sticky; top: 0; z-index: 9999; background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
+        <a href="/" style="text-decoration: none; color: var(--accent); font-weight: 500; font-size: 13px; display: flex; align-items: center; gap: 6px;">
             ← Загрузить другой файл
         </a>
         <div style="display: flex; gap: 12px; align-items: center;">
-            <span style="font-size: 13px; color: #6B7280;">Файл: <strong>{data['filename']}</strong></span>
-            <a href="/download/{report_id}" style="text-decoration: none; background: #4A3AFF; color: #FFFFFF; padding: 6px 14px; border-radius: 6px; font-weight: 500; font-size: 13px; display: inline-block;">
+            <span style="font-size: 13px; color: var(--text-dim);">Файл: <strong style="color: var(--text);">{data['filename']}</strong></span>
+            <a href="/download/{report_id}" style="text-decoration: none; background: var(--accent); color: #FFFFFF; padding: 6px 14px; border-radius: 6px; font-weight: 500; font-size: 13px; display: inline-block;">
                 📥 Скачать HTML-отчет
             </a>
         </div>
