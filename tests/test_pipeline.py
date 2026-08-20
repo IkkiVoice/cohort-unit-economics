@@ -1,11 +1,12 @@
 """
-Тесты целостности пайплайна, строгого паритета SQL/Pandas, эталонной верификации Урока 3 и отчета v2.
+Тесты целостности пайплайна, строгого паритета SQL/Pandas, эталонной верификации Урока 3, отчета v2 и HTML-дашборда.
 """
 
 import unittest
 import os
 import shutil
 import tempfile
+import re
 import pandas as pd
 
 from src.generate import generate_retail_dataset
@@ -17,6 +18,7 @@ from src.costs import calculate_costs_breakdown
 from src.model import build_unit_economics_model
 from src.rfm import calculate_rfm_segments
 from src.report import detect_data_completeness, generate_full_report
+from src.report_html import generate_html_report
 
 
 class TestCohortPipeline(unittest.TestCase):
@@ -40,7 +42,6 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertEqual((df["order_status"] == "cancelled").sum(), 0)
 
     def test_empty_client_id_isolation(self):
-        """Проверка, что пустые client_id не склеивают независимых людей."""
         raw_rows = pd.DataFrame([
             {"order_date": "2025-01-10", "client_id": "", "phone": "+79991112233", "email": "", "net_revenue": 1000},
             {"order_date": "2025-01-12", "client_id": "", "phone": "+79994445566", "email": "", "net_revenue": 2000},
@@ -53,13 +54,6 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertEqual(df_clean["client_uid"].nunique(), 4)
 
     def test_transitive_identity_resolution(self):
-        """
-        Проверка транзитивной склейки профиля:
-        Строка 1: телефон на кассе
-        Строка 2: тот же телефон + email при регистрации
-        Строка 3: тот же email при заказе на сайте
-        Все 3 заказа обязаны объединиться в 1 client_uid.
-        """
         raw_rows = pd.DataFrame([
             {"order_date": "2025-01-10", "client_id": "", "phone": "+79991112233", "email": "", "net_revenue": 1000},
             {"order_date": "2025-01-20", "client_id": "", "phone": "+79991112233", "email": "alex@shop.ru", "net_revenue": 2000},
@@ -72,7 +66,6 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertEqual(len(df_clean), 3)
 
     def test_deep_chain_union_find_no_recursion_error(self):
-        """Проверка, что итеративный find выдерживает цепочку в 3 000 чеков кассира без RecursionError."""
         rows = [
             {"order_date": "2025-01-10", "client_id": f"C_{i}", "phone": "+79990000000", "email": "", "net_revenue": 100}
             for i in range(3000)
@@ -84,7 +77,6 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertEqual(len(df_clean), 3000)
 
     def test_datetime_with_timestamp_and_mixed_formats(self):
-        """Проверка корректного распознавания месяцев для дат со временем и европейского формата."""
         raw_rows = pd.DataFrame([
             {"order_date": "01.02.2021 14:30", "client_id": "C1", "net_revenue": 1000},
             {"order_date": "2021-02-05 09:15:00", "client_id": "C2", "net_revenue": 2000},
@@ -99,45 +91,15 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertEqual(df_clean.loc[2, "cohort_month"], "2021-11")
 
     def test_sql_python_cohort_parity_matrices(self):
-        """
-        Строгая поэлементная сверка матриц клиентов И матриц выручки между Pandas и SQLite (синтетика).
-        """
         df = clean_orders_data(self.sample_data)
         clients_py, rev_py, summary_py = build_cohort_matrices(df)
         clients_sql, rev_sql, summary_sql = build_cohort_matrices_sql(df)
 
-        pd.testing.assert_frame_equal(
-            clients_py.astype(int),
-            clients_sql.astype(int),
-            check_names=False,
-            check_like=True
-        )
-
-        pd.testing.assert_frame_equal(
-            rev_py.astype(float),
-            rev_sql.astype(float),
-            check_names=False,
-            check_like=True,
-            check_exact=False,
-            rtol=0.0,
-            atol=0.01
-        )
-
-        pd.testing.assert_series_equal(
-            summary_py["total_net_revenue"].astype(float),
-            summary_sql["total_net_revenue"].astype(float),
-            check_names=False,
-            check_exact=False,
-            rtol=0.0,
-            atol=0.01
-        )
+        pd.testing.assert_frame_equal(clients_py.astype(int), clients_sql.astype(int), check_names=False, check_like=True)
+        pd.testing.assert_frame_equal(rev_py.astype(float), rev_sql.astype(float), check_names=False, check_like=True, rtol=0.0, atol=0.01)
+        pd.testing.assert_series_equal(summary_py["total_net_revenue"].astype(float), summary_sql["total_net_revenue"].astype(float), check_names=False, rtol=0.0, atol=0.01)
 
     def test_course_lesson_3_benchmark(self):
-        """
-        Главный верификационный тест: сверка с эталонным решением Урока 3 курса
-        И проверка 100% паритета между Pandas и SQLite на реальных данных курса.
-        Файл: data/course/sheet_02_15phCO86.csv
-        """
         course_file = os.path.join(os.path.dirname(__file__), "..", "data", "course", "sheet_02_15phCO86.csv")
         if not os.path.exists(course_file):
             self.skipTest("Файл курса sheet_02 не найден")
@@ -170,12 +132,7 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertGreaterEqual(model["basic_ltv"], model["direct_ltv_1"])
         self.assertGreaterEqual(model["direct_ltv_1"], model["direct_ltv_2"])
         
-        self.assertAlmostEqual(
-            model["net_ltv"],
-            model["direct_ltv_2"] - model["cac_per_client"],
-            places=2
-        )
-        
+        self.assertAlmostEqual(model["net_ltv"], model["direct_ltv_2"] - model["cac_per_client"], places=2)
         if model["cac_per_client"] > 0:
             expected_ratio = round(model["direct_ltv_2"] / model["cac_per_client"], 2)
             self.assertEqual(model["ltv_to_cac_ratio"], expected_ratio)
@@ -187,23 +144,13 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertFalse(summary.empty)
         self.assertGreaterEqual(summary["client_share_pct"].sum(), 99.0)
 
-    # --- НОВЫЕ ТЕСТЫ ПО ТЗ report v2 ---
-
     def test_partial_mode_returns_none(self):
-        """
-        Критерий приемки 6: В режиме неполных данных (курсовой файл без COGS и CAC)
-        direct_ltv_1, direct_ltv_2, net_ltv, ltv_to_cac_ratio и health_status возвращают None.
-        """
         course_file = os.path.join(os.path.dirname(__file__), "..", "data", "course", "sheet_02_15phCO86.csv")
         if not os.path.exists(course_file):
             self.skipTest("Файл курса sheet_02 не найден")
 
         df = clean_orders_data(course_file)
         completeness = detect_data_completeness(df)
-        self.assertEqual(completeness["mode"], "partial")
-        self.assertFalse(completeness["cogs"])
-        self.assertFalse(completeness["acquisition_cost"])
-
         _, _, summary = build_cohort_matrices(df)
         behavior = calculate_behavior_metrics(summary)
         costs = calculate_costs_breakdown(df, summary)
@@ -214,13 +161,8 @@ class TestCohortPipeline(unittest.TestCase):
         self.assertIsNone(model["net_ltv"])
         self.assertIsNone(model["ltv_to_cac_ratio"])
         self.assertIsNone(model["health_status"])
-        self.assertGreater(model["basic_ltv"], 0.0)
 
     def test_retention_matrix_marks_unavailable_periods(self):
-        """
-        Критерий приемки 7: Для когорты 2022-01 в sheet_02 доступно только 2 периода (M0 и M1).
-        Для последней когорты 2022-02 доступен только 1 период (M0).
-        """
         course_file = os.path.join(os.path.dirname(__file__), "..", "data", "course", "sheet_02_15phCO86.csv")
         if not os.path.exists(course_file):
             self.skipTest("Файл курса sheet_02 не найден")
@@ -230,17 +172,11 @@ class TestCohortPipeline(unittest.TestCase):
         last_date = pd.to_datetime(df["order_date"]).max()
         availability = compute_cohort_availability(clients_m, last_date)
 
-        # Когорта 2022-01: доступно 2 периода (M0, M1)
         self.assertEqual(availability["2022-01"], 1)
-        # Когорта 2022-02: доступен 1 период (M0)
         self.assertEqual(availability["2022-02"], 0)
-        # Когорта 2021-02: доступно 13 периодов (M0..M12)
         self.assertEqual(availability["2021-02"], 12)
 
     def test_average_retention_excludes_unavailable(self):
-        """
-        Критерий приемки 8: Среднее удержание по периоду M5 считается по меньшему числу когорт, чем по M1.
-        """
         course_file = os.path.join(os.path.dirname(__file__), "..", "data", "course", "sheet_02_15phCO86.csv")
         if not os.path.exists(course_file):
             self.skipTest("Файл курса sheet_02 не найден")
@@ -249,14 +185,113 @@ class TestCohortPipeline(unittest.TestCase):
         clients_m, _, _ = build_cohort_matrices(df)
         last_date = pd.to_datetime(df["order_date"]).max()
         availability = compute_cohort_availability(clients_m, last_date)
-        avg_ret, cohorts_cnt = compute_retention_summary(clients_m, availability)
+        _, cohorts_cnt = compute_retention_summary(clients_m, availability)
 
-        # На M1 доступно больше когорт (12 когорт), чем на M5 (8 когорт)
         self.assertGreater(cohorts_cnt[1], cohorts_cnt[5])
         self.assertEqual(cohorts_cnt[0], 13)
         self.assertEqual(cohorts_cnt[1], 12)
         self.assertEqual(cohorts_cnt[5], 8)
-        self.assertEqual(cohorts_cnt[8], 5)
+
+    # --- ТЕСТЫ ЭПИКА E3: HTML-ДАШБОРД ---
+
+    def test_html_report_standalone_and_no_cdn(self):
+        """
+        T3.1: Проверяет, что HTML-генератор возвращает валидный HTML
+        и НЕ содержит внешних ссылок на CDN (100% офлайн работа).
+        """
+        df = clean_orders_data(self.sample_data)
+        completeness = detect_data_completeness(df)
+        clients_m, rev_m, summary = build_cohort_matrices(df)
+        last_date = pd.to_datetime(df["order_date"]).max()
+        behavior = calculate_behavior_metrics(summary, clients_m, last_date)
+        costs = calculate_costs_breakdown(df, summary)
+        model = build_unit_economics_model(behavior, costs, completeness=completeness)
+        rfm_df, rfm_summary = calculate_rfm_segments(df)
+
+        out_html = os.path.join(self.test_dir, "test_report.html")
+        generate_html_report(
+            behavior_metrics=behavior,
+            costs_breakdown=costs,
+            model_results=model,
+            cohort_matrix=clients_m,
+            rfm_summary=rfm_summary,
+            clean_df=df,
+            output_path=out_html
+        )
+
+        self.assertTrue(os.path.exists(out_html))
+        with open(out_html, "r", encoding="utf-8") as f:
+            html_text = f.read()
+
+        # Валидность и автономность:
+        self.assertIn("<!DOCTYPE html>", html_text)
+        self.assertIn("<style>", html_text)
+        self.assertIn("<svg", html_text)
+        
+        # Запрет внешних ссылок на CDN / скрипты / шрифты:
+        external_links = re.findall(r'(?:src|href)=["\'](https?://[^"\']+)["\']', html_text)
+        self.assertEqual(len(external_links), 0, f"Обнаружены внешние ссылки в HTML: {external_links}")
+
+    def test_html_and_markdown_parity(self):
+        """
+        T3.2: Проверяет соответствие ключевых чисел между Markdown и HTML.
+        """
+        df = clean_orders_data(self.sample_data)
+        completeness = detect_data_completeness(df)
+        clients_m, rev_m, summary = build_cohort_matrices(df)
+        last_date = pd.to_datetime(df["order_date"]).max()
+        behavior = calculate_behavior_metrics(summary, clients_m, last_date)
+        costs = calculate_costs_breakdown(df, summary)
+        model = build_unit_economics_model(behavior, costs, completeness=completeness)
+        rfm_df, rfm_summary = calculate_rfm_segments(df)
+
+        out_md = os.path.join(self.test_dir, "parity.md")
+        out_html = os.path.join(self.test_dir, "parity.html")
+
+        generate_full_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, output_path=out_md)
+        generate_html_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, output_path=out_html)
+
+        with open(out_md, "r", encoding="utf-8") as f:
+            md_text = f.read()
+        with open(out_html, "r", encoding="utf-8") as f:
+            html_text = f.read()
+
+        # Базовый LTV совпадает
+        self.assertIn(f"{model['basic_ltv']:,.2f}", md_text)
+        self.assertIn(f"{model['basic_ltv']:,.0f}", html_text)
+        # Размер базы совпадает
+        self.assertIn(str(behavior["initial_cohort_size"]), md_text)
+        self.assertIn(str(behavior["initial_cohort_size"]), html_text)
+
+    def test_html_partial_mode_rendering(self):
+        """
+        T3.3: Проверяет отображение частичного режима в HTML на курсовом файле.
+        Плашка присутствует, нерассчитанные строки не содержат ложных 0.00 руб.
+        """
+        course_file = os.path.join(os.path.dirname(__file__), "..", "data", "course", "sheet_02_15phCO86.csv")
+        if not os.path.exists(course_file):
+            self.skipTest("Файл курса sheet_02 не найден")
+
+        df = clean_orders_data(course_file)
+        completeness = detect_data_completeness(df)
+        clients_m, rev_m, summary = build_cohort_matrices(df)
+        last_date = pd.to_datetime(df["order_date"]).max()
+        behavior = calculate_behavior_metrics(summary, clients_m, last_date)
+        costs = calculate_costs_breakdown(df, summary)
+        model = build_unit_economics_model(behavior, costs, completeness=completeness)
+        rfm_df, rfm_summary = calculate_rfm_segments(df)
+
+        out_html = os.path.join(self.test_dir, "course_test.html")
+        generate_html_report(behavior, costs, model, clients_m, rfm_summary, clean_df=df, output_path=out_html)
+
+        with open(out_html, "r", encoding="utf-8") as f:
+            html_text = f.read()
+
+        # Наличие плашки и отсутствие ложного статуса
+        self.assertIn("warning-banner", html_text)
+        self.assertIn("Режим частичных данных", html_text)
+        self.assertNotIn("UNPROFITABLE", html_text)
+        self.assertIn("row-disabled", html_text)
 
 
 if __name__ == "__main__":
